@@ -18,7 +18,7 @@ const RoutineItem = ({
     return (
         <Card className="mx-3 mb-3 card-container">
             <Card.Img
-                height={400}
+                height={100}
                 variant="top"
                 src={imageUrl}
             />

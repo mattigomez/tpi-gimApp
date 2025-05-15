@@ -20,7 +20,7 @@ const Routines = ({ routines }) => {
       onRoutineSelected={handleRoutineSelected} />);
   
 
-    return (
+    return ( 
         <>
             {selectedRoutine &&
                 <p>Usted ha seleccionado la rutina: <b>{selectedRoutine}</b></p>

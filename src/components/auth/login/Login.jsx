@@ -2,6 +2,8 @@ import { useRef, useState } from "react"
 import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router";
 
+import "./Login.css"
+
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("")
@@ -56,7 +58,7 @@ const Login = ({ onLogin }) => {
     <Card className="mt-5 mx-3 p-3 px-5 shadow">
       <Card.Body>
         <Row className="mb-2">
-          <h5>Bienvenidos a gimApp!</h5>
+          <h5>GimHub</h5>
         </Row>
         <Form onSubmit={handleSubmit}>
           <FormGroup className="mb-4">
@@ -80,8 +82,8 @@ const Login = ({ onLogin }) => {
             />
           </FormGroup>
           <Row>
-            <Col md={6} className="d-flex justify-content-end">
-              <Button variant="secondary" type="submit">
+            <Col className="mb-2">
+              <Button variant="secondary" type="submit" className="w-100">
                 Iniciar sesión 
               </Button>
             </Col>
