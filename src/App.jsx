@@ -5,6 +5,7 @@ import Dashboard from "./components/dashboard/Dashboard"
 import NotFound from "./components/routes/notFound/NotFound"
 import Protected from './components/routes/protected/Protected';
 import { ToastContainer } from 'react-toastify';
+import Home from './components/home/Home';
 
 const App = () => {
 
@@ -26,7 +27,8 @@ const App = () => {
           <Route path='/' element={<Navigate to='login' />}/>
           <Route path="login" element={<Login onLogin={handleSignIn}/>} />
           <Route element={<Protected isSignedIn={isSignedIn} />}>
-            <Route path="/home/*" element={<Dashboard onLogout={handleLogout} />} />
+            <Route path="/home/*" element={<Home onLogout={handleLogout} />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
