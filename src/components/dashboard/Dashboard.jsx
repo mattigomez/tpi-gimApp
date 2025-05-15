@@ -5,7 +5,7 @@ import Routines from "../routines/Routines";
 import NewRoutine from "../newRoutine/NewRoutine";
 import Header from "../header/Header"
 
-const Dashboard = ({ onLogout }) => {
+const Dashboard = ({onLogout}) => {
   const [routines, setRoutines] = useState(dataRoutines);
 
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Dashboard = ({ onLogout }) => {
 
   return (
     <>
-      <Header/>
+      <Header onLogout={onLogout}/>
       <h2>GYMHUB</h2>
       <Routes>
         <Route

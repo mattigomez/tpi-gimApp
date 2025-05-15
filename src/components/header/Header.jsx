@@ -3,8 +3,9 @@ import { Button} from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
+import { useNavigate } from "react-router";
 
-export const Header = (onLogout) => {
+const Header = ( {onLogout} ) => {
   const handleNavigateAddRoutine = () => {
     navigate("/home/add-routine", { replace: true });
   };
@@ -12,6 +13,11 @@ export const Header = (onLogout) => {
   const handleNavigateHome = () => {
     navigate("/home", { replace: true });
   };
+  const navigate = useNavigate();
+  const handleLogout = () =>{
+      onLogout();
+      navigate("/login");
+  }
   return (
     <Navbar fixed="top" expand="lg" bg="dark" data-bs-theme="dark">
     <Container>
@@ -42,7 +48,7 @@ export const Header = (onLogout) => {
           >
             Agregar Rutina
           </Button>
-          <Button variant="danger" onClick={onLogout}>
+          <Button variant="danger" onClick={handleLogout}>
             Cerrar sesión
           </Button>
         </Nav>
