@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import Login from './components/auth/login/Login'
@@ -8,35 +9,32 @@ import { ToastContainer } from 'react-toastify';
 import Home from './components/home/Home';
 
 const App = () => {
-
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   const handleSignIn = () => {
     setIsSignedIn(true);
-  }
+  };
 
   const handleLogout = () => {
     setIsSignedIn(false);
-  }
+  };
 
   return (
     <div className="d-flex flex-column align-items-center">
       <ToastContainer />
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<Navigate to='login' />}/>
-          <Route path="login" element={<Login onLogin={handleSignIn}/>} />
+          <Route path="/" element={<Navigate to="login" />} />
+          <Route path="login" element={<Login onLogin={handleSignIn} />} />
           <Route element={<Protected isSignedIn={isSignedIn} />}>
             <Route path="/home/*" element={<Home onLogout={handleLogout} />} />
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
-
       </BrowserRouter>
-
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
