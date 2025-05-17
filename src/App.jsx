@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
-import Login from "./components/auth/login/Login";
-import Dashboard from "./components/dashboard/Dashboard";
-import NotFound from "./components/routes/notFound/NotFound";
-import Protected from "./components/routes/protected/Protected";
-import { ToastContainer } from "react-toastify";
+
+import { useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
+import Login from './components/auth/login/Login'
+import Dashboard from "./components/dashboard/Dashboard"
+import NotFound from "./components/routes/notFound/NotFound"
+import Protected from './components/routes/protected/Protected';
+import { ToastContainer } from 'react-toastify';
+import Home from './components/home/Home';
 
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -25,10 +27,8 @@ const App = () => {
           <Route path="/" element={<Navigate to="login" />} />
           <Route path="login" element={<Login onLogin={handleSignIn} />} />
           <Route element={<Protected isSignedIn={isSignedIn} />}>
-            <Route
-              path="/home/*"
-              element={<Dashboard onLogout={handleLogout} />}
-            />
+            <Route path="/home/*" element={<Home onLogout={handleLogout} />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,0 +1,86 @@
+/* Centrar vertical y horizontal */
+body, #root {
+  min-height: 100vh;
+  background: #6d6d65;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Card */
+.card {
+  background: #111;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 24px rgba(0,0,0,0.5);
+  max-width: 370px;
+  width: 100%;
+  padding: 32px 32px 24px 32px;
+}
+
+/* Título principal */
+.card h5 {
+  font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+/* Inputs */
+.form-control {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+/* Placeholder visible */
+.form-control::placeholder {
+  color: #bdbdbd;
+  opacity: 1;
+}
+
+.form-control:focus {
+  background: transparent;
+  color: #fff;
+  border-color: #39e639;
+  box-shadow: none;
+}
+
+/* Botón verde ancho */
+.btn-secondary[type="submit"], .btn-secondary.w-100 {
+  background: #39e639;
+  color: #111;
+  border: none;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 12px;
+  transition: background 0.2s;
+}
+
+.btn-secondary[type="submit"]:hover, .btn-secondary.w-100:hover {
+  background: #2ecc2e;
+  color: #fff;
+}
+
+/* Mensaje de error */
+.text-danger {
+  color: #ff4d4d !important;
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+/* Ajustes para filas y columnas */
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.col {
+  padding-left: 0;
+  padding-right: 0;
+}
