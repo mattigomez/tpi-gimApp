@@ -5,7 +5,7 @@ import Routines from "../routines/Routines";
 import NewRoutine from "../newRoutine/NewRoutine";
 import Header from "../header/Header"
 
-const Dashboard = () => {
+const Dashboard = ({onLogout}) => {
   const [routines, setRoutines] = useState(dataRoutines);
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ const Dashboard = () => {
       padding: "100px",
     }}
   >
-    <Header onLogout={handleLogout} />
+    <Header onLogout={onLogout} />
     <h2>Tus rutinas</h2>
     <Routes>
       <Route
