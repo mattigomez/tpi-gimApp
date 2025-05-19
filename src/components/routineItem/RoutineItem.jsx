@@ -39,6 +39,7 @@ const RoutineItem = ({
                 <Button onClick={handleSelectRoutine}>Seleccionar rutina</Button>
             </Card.Body>
         </Card>
+        
     );
 };
 

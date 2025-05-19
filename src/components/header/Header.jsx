@@ -8,9 +8,7 @@ import { useNavigate } from "react-router";
 
 const Header = ( {onLogout} ) => {
 
-  const handleNavigateAddRoutine = () => {
-    navigate("/home/add-routine", { replace: true });
-  };
+
 
   const handleNavigateHome = () => {
     navigate("/home", { replace: true });
@@ -42,13 +40,6 @@ const Header = ( {onLogout} ) => {
             onClick={handleNavigateHome}
           >
             Home
-          </Button>
-          <Button
-            variant="success"
-            className="me-2"
-            onClick={handleNavigateAddRoutine}
-          >
-            Agregar Rutina
           </Button>
           <Button variant="danger" onClick={handleLogout}>
             Cerrar sesión
