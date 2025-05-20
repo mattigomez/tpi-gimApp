@@ -72,17 +72,6 @@ const NewRoutine = ({ onAddRoutine }) => {
               />
             </Form.Group>
           </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Duración</Form.Label>
-              <Form.Control
-                type="text"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                placeholder="Ej. 45 minutos"
-              />
-            </Form.Group>
-          </Col>
         </Row>
         <Form.Group className="mb-3">
           <Form.Label>Descripción</Form.Label>

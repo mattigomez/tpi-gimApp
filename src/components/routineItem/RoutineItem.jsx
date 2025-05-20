@@ -17,15 +17,9 @@ const RoutineItem = ({
 
     return (
         <Card className="mx-3 mb-3 card-container">
-            <Card.Img
-                height={100}
-                variant="top"
-                src={imageUrl}
-            />
             <Card.Body>
                 <Badge bg="primary" className="mb-2">{level}</Badge>
                 <Card.Title>{title}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">{duration}</Card.Subtitle>
                 <Card.Text>{description}</Card.Text>
 
                 <ListGroup className="mb-3" variant="flush">
