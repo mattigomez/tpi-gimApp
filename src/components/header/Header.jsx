@@ -1,10 +1,14 @@
 
 import { Button} from "react-bootstrap";
+import { useNavigate } from 'react-router'
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 
 export const Header = (onLogout) => {
+
+  const navigate = useNavigate();
+
   const handleNavigateAddRoutine = () => {
     navigate("/home/add-routine", { replace: true });
   };
