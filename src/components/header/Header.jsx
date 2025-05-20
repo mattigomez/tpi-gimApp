@@ -1,21 +1,23 @@
 
-import { Button} from "react-bootstrap";
-import { useNavigate } from 'react-router'
+import { Button } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 
-export const Header = (onLogout) => {
+import { useNavigate } from "react-router";
 
-  const navigate = useNavigate();
+const Header = ( {onLogout} ) => {
 
-  const handleNavigateAddRoutine = () => {
-    navigate("/home/add-routine", { replace: true });
-  };
+
 
   const handleNavigateHome = () => {
     navigate("/home", { replace: true });
   };
+  const navigate = useNavigate();
+  const handleLogout = () =>{
+      onLogout();
+      navigate("/login");
+  }
   return (
     <Navbar fixed="top" expand="lg" bg="dark" data-bs-theme="dark">
     <Container>
@@ -39,14 +41,7 @@ export const Header = (onLogout) => {
           >
             Home
           </Button>
-          <Button
-            variant="success"
-            className="me-2"
-            onClick={handleNavigateAddRoutine}
-          >
-            Agregar Rutina
-          </Button>
-          <Button variant="danger" onClick={onLogout}>
+          <Button variant="danger" onClick={handleLogout}>
             Cerrar sesión
           </Button>
         </Nav>

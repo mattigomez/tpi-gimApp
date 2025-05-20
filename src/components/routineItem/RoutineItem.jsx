@@ -18,7 +18,7 @@ const RoutineItem = ({
     return (
         <Card className="mx-3 mb-3 card-container">
             <Card.Img
-                height={400}
+                height={100}
                 variant="top"
                 src={imageUrl}
             />
@@ -39,6 +39,7 @@ const RoutineItem = ({
                 <Button onClick={handleSelectRoutine}>Seleccionar rutina</Button>
             </Card.Body>
         </Card>
+        
     );
 };
 
