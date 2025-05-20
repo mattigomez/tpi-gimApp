@@ -6,6 +6,7 @@ import NotFound from "./components/routes/notFound/NotFound";
 import Protected from "./components/routes/protected/Protected";
 import { ToastContainer } from "react-toastify";
 import Home from "./components/home/Home";
+import Account from "./components/account/Account";
 
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
