@@ -46,7 +46,7 @@ const Dashboard = ({onLogout}) => {
         }
       />
       <Route
-        path="/add-routine"
+        path="add-routine"
         element={<NewRoutine onAddRoutine={handleAddRoutine} />}
       />
     </Routes>
