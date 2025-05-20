@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Card, Col, Form, Row, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const NewRoutine = ({ onAddRoutine }) => {
   const [title, setTitle] = useState("");
@@ -42,13 +43,13 @@ const NewRoutine = ({ onAddRoutine }) => {
       exercises,
     };
     onAddRoutine(newRoutine);
-    // Reset form
     setTitle("");
     setDescription("");
     setDuration("");
     setLevel("Principiante");
     setImageUrl("");
     setExercises([]);
+    toast.success("Rutina creada con éxito", { onClose: () => navigate("/dashboard") });
   };
  const navigate = useNavigate();
   const handleGoBack = () =>{
