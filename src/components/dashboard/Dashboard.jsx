@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Route, Routes, useNavigate } from "react-router";
+import { Route, Routes } from "react-router";
 import { routines as dataRoutines } from "../../data/routines";
 import Routines from "../routines/Routines";
 import NewRoutine from "../newRoutine/NewRoutine";
@@ -7,11 +7,6 @@ import Header from "../header/Header"
 
 const Dashboard = ({onLogout}) => {
   const [routines, setRoutines] = useState(dataRoutines);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate("/login", { replace: true });
-  }
 
   const handleAddRoutine = (newRoutine) => {
     setRoutines((prevRoutines) => [newRoutine, ...prevRoutines]);

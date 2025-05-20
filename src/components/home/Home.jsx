@@ -26,7 +26,7 @@ const Home = ({ userType }) => {
       <div style={{ display: "flex", gap: "32px" }}>
         <Card
           style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
-          onClick={() => navigate("/cuenta")}
+          onClick={() => navigate("/account")}
         >
           <Card.Body className="d-flex flex-column align-items-center">
             <span style={{ fontSize: "48px", marginBottom: "12px" }}>👤</span>
