@@ -35,7 +35,7 @@ const Home = ({ userType }) => {
         </Card>
         <Card
           style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
-          onClick={() => navigate("/socios")}
+          onClick={() => navigate("/partners")}
         >
           <Card.Body className="d-flex flex-column align-items-center">
             <span style={{ fontSize: "48px", marginBottom: "12px" }}>📈</span>
