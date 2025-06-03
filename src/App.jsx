@@ -7,6 +7,7 @@ import Protected from "./components/routes/protected/Protected";
 import Home from "./components/home/Home";
 import Account from "./components/account/Account";
 import { ToastContainer } from "react-toastify";
+import Partners from "./components/partners/Partners";
 
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -30,6 +31,7 @@ const App = () => {
             <Route path="/dashboard/*" element={<Dashboard />} />
           </Route>
           <Route path="/account" element={<Account />} />
+          <Route path="/partners" element={<Partners />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
