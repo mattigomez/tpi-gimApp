@@ -31,7 +31,7 @@ const RoutineItem = ({
                 <ListGroup className="mb-3" variant="flush">
                     {exercises.map((exercise, index) => (
                         <ListGroup.Item key={index}>
-                            {exercise.name} - {exercise.sets}x{exercise.reps ?? exercise.duration}
+                            {exercise.name} - {exercise.sets}x{exercise.repetitions ?? exercise.reps ?? exercise.duration ?? ''}
                         </ListGroup.Item>
                     ))}
                 </ListGroup>
