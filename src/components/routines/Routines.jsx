@@ -6,6 +6,9 @@ import { useNavigate } from "react-router";
 const Routines = ({ routines }) => {
   const [selectedRoutine, setSelectedRoutine] = useState("");
 
+  // Recibe la función para refrescar rutinas desde el padre si existe
+  const refreshRoutines = typeof window.refreshRoutines === 'function' ? window.refreshRoutines : undefined;
+
   const handleRoutineSelected = (routineTitle) => {
     setSelectedRoutine(routineTitle);
   };
@@ -23,7 +26,9 @@ const Routines = ({ routines }) => {
       level={routine.level}
       imageUrl={routine.imageUrl}
       exercises={routine.exercises}
+      id={routine.id}
       onRoutineSelected={handleRoutineSelected}
+      refreshRoutines={refreshRoutines}
     />
   ));
 
