@@ -11,8 +11,6 @@ const RoutineItem = ({
     exercises,
     onRoutineSelected,
     id,
-    duration,
-    imageUrl,
     refreshRoutines
 }) => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -24,7 +22,7 @@ const RoutineItem = ({
     };
 
     const handleEdit = () => {
-        setEditData({ id, title, description, level, exercises, duration, imageUrl });
+        setEditData({ id, title, description, level, exercises });
         setShowEditModal(true);
     };
 
@@ -69,7 +67,7 @@ const RoutineItem = ({
                 <ListGroup className="mb-3" variant="flush">
                     {exercises.map((exercise, index) => (
                         <ListGroup.Item key={index}>
-                            {exercise.name} - {exercise.sets}x{exercise.repetitions ?? exercise.reps ?? exercise.duration ?? ''}
+                            {exercise.name} - {exercise.sets}x{exercise.repetitions ?? exercise.reps ?? ''}
                         </ListGroup.Item>
                     ))}
                 </ListGroup>

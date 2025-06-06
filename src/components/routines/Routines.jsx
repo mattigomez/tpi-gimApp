@@ -22,9 +22,7 @@ const Routines = ({ routines }) => {
       key={routine.id}
       title={routine.title}
       description={routine.description}
-      duration={routine.duration}
       level={routine.level}
-      imageUrl={routine.imageUrl}
       exercises={routine.exercises}
       id={routine.id}
       onRoutineSelected={handleRoutineSelected}
