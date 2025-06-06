@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { Card, Button, Badge, ListGroup } from "react-bootstrap";
+import { PencilSquare, XCircle } from "react-bootstrap-icons";
+import NewRoutine from "../newRoutine/NewRoutine";
 import './routineItem.css';
 
 const RoutineItem = ({
@@ -6,15 +9,56 @@ const RoutineItem = ({
     description,
     level,
     exercises,
-    onRoutineSelected
+    onRoutineSelected,
+    id,
+    refreshRoutines
 }) => {
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editData, setEditData] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleSelectRoutine = () => {
         onRoutineSelected(title);
     };
 
+    const handleEdit = () => {
+        setEditData({ id, title, description, level, exercises });
+        setShowEditModal(true);
+    };
+
+    const handleDelete = async () => {
+        try {
+            const res = await fetch(`http://localhost:3000/routines/${id}`, { method: "DELETE" });
+            if (res.ok) {
+                setShowDeleteModal(false);
+                if (refreshRoutines) refreshRoutines();
+            } else {
+                alert("Error al eliminar la rutina");
+            }
+        } catch {
+            alert("Error de conexión al eliminar");
+        }
+    };
+
     return (
-        <Card className="mx-3 mb-3 card-container">
+        <>
+        <Card className="mx-3 mb-3 card-container" style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 2, display: 'flex', gap: 8 }}>
+                <Button
+                    variant="link"
+                    style={{ color: '#333', padding: 0 }}
+                    onClick={handleEdit}
+                >
+                    <PencilSquare size={22} />
+                </Button>
+                <Button
+                    variant="link"
+                    style={{ color: '#c00', padding: 0 }}
+                    onClick={() => setShowDeleteModal(true)}
+                >
+                    <XCircle size={22} />
+                </Button>
+            </div>
             <Card.Body>
                 <Badge bg="primary" className="mb-2">{level}</Badge>
                 <Card.Title>{title}</Card.Title>
@@ -23,7 +67,7 @@ const RoutineItem = ({
                 <ListGroup className="mb-3" variant="flush">
                     {exercises.map((exercise, index) => (
                         <ListGroup.Item key={index}>
-                            {exercise.name} - {exercise.sets}x{exercise.repetitions ?? exercise.reps ?? exercise.duration ?? ''}
+                            {exercise.name} - {exercise.sets}x{exercise.repetitions ?? exercise.reps ?? ''}
                         </ListGroup.Item>
                     ))}
                 </ListGroup>
@@ -31,7 +75,67 @@ const RoutineItem = ({
                 <Button onClick={handleSelectRoutine}>Seleccionar rutina</Button>
             </Card.Body>
         </Card>
-        
+        {showEditModal && (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999
+            }}>
+                <div style={{ minWidth: 400 }}>
+                    <NewRoutine
+                        initialData={editData}
+                        isEditMode={true}
+                        onClose={() => {
+                          setShowEditModal(false);
+                          if (refreshRoutines) refreshRoutines();
+                        }}
+                    />
+                </div>
+            </div>
+        )}
+        {showDeleteModal && (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999
+            }}>
+                <div style={{
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: 32,
+                    minWidth: 320,
+                    textAlign: 'center',
+                    boxShadow: '0 0 24px rgba(0,0,0,0.3)'
+                }}>
+                    <h5 style={{ marginBottom: 24 }}>¿Estás seguro que desea eliminar la rutina?</h5>
+                    <div className="d-flex justify-content-center gap-3">
+                        <Button
+                            variant="danger"
+                            onClick={handleDelete}
+                        >Eliminar</Button>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowDeleteModal(false)}
+                        >Cancelar</Button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 };
 
