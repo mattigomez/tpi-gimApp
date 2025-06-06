@@ -19,12 +19,6 @@ const Dashboard = ({ onLogout }) => {
       .then(data => setRoutines(data));
   };
 
-  const handleDeleteRoutine = (routineId) => {
-    setRoutines((prevRoutines) =>
-      prevRoutines.filter((routine) => routine.id !== routineId)
-    );
-  };
-
   useEffect(() => {
     window.refreshRoutines = refreshRoutines;
     return () => { window.refreshRoutines = null; };
@@ -47,7 +41,7 @@ const Dashboard = ({ onLogout }) => {
         <Route
           index
           element={
-            <Routines routines={routines} onDelete={handleDeleteRoutine} />
+            <Routines routines={routines} />
           }
         />
         <Route
