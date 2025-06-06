@@ -3,21 +3,21 @@ import { Button, Card, Col, Form, Row, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
-const NewRoutine = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [level, setLevel] = useState("principiante");
-
-  // Para agregar ejercicios nuevos
+const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [description, setDescription] = useState(initialData?.description || "");
+  const [level, setLevel] = useState(initialData?.level || "principiante");
+  const [exercises, setExercises] = useState(initialData?.exercises || []);
   const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState("");
   const [repetitions, setRepetitions] = useState("");
-  const [exercises, setExercises] = useState([]);
-
-  // Para seleccionar ejercicios existentes
   const [availableExercises, setAvailableExercises] = useState([]);
   const [selectedExerciseId, setSelectedExerciseId] = useState("");
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [exerciseToDelete, setExerciseToDelete] = useState(null);
+  const [editingExerciseId, setEditingExerciseId] = useState(null);
+  const [editSets, setEditSets] = useState("");
+  const [editRepetitions, setEditRepetitions] = useState("");
   const navigate = useNavigate();
 
   // Traer ejercicios existentes al montar
@@ -26,6 +26,16 @@ const NewRoutine = () => {
       .then(res => res.json())
       .then(data => setAvailableExercises(data));
   }, []);
+
+  // Rellenar datos si es modo edición
+  useEffect(() => {
+    if (isEditMode && initialData) {
+      setTitle(initialData.title || "");
+      setDescription(initialData.description || "");
+      setLevel(initialData.level || "principiante");
+      setExercises(initialData.exercises || []);
+    }
+  }, [initialData, isEditMode]);
 
   // Agregar ejercicio nuevo
   const handleAddExercise = () => {
@@ -67,28 +77,38 @@ const NewRoutine = () => {
   // Enviar rutina a la API
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const newRoutine = {
+    const routineData = {
       title,
       description,
       level,
       exercises,
     };
     try {
-      const res = await fetch("http://localhost:3000/routines", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newRoutine),
-      });
+      let res;
+      if (isEditMode && initialData?.id) {
+        res = await fetch(`http://localhost:3000/routines/${initialData.id}` , {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(routineData),
+        });
+      } else {
+        res = await fetch("http://localhost:3000/routines", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(routineData),
+        });
+      }
       if (res.ok) {
         setTitle("");
         setDescription("");
         setLevel("principiante");
         setExercises([]);
-        toast.success("Rutina creada con éxito");
-        navigate("/dashboard");
+        toast.success(isEditMode ? "Rutina actualizada con éxito" : "Rutina creada con éxito");
         if (typeof window.refreshRoutines === "function") window.refreshRoutines();
+        if (onClose) onClose();
+        if (!isEditMode) navigate("/dashboard");
       } else {
-        toast.error("Error al crear rutina");
+        toast.error(isEditMode ? "Error al actualizar rutina" : "Error al crear rutina");
       }
     } catch {
       toast.error("Error de conexión");
@@ -96,12 +116,13 @@ const NewRoutine = () => {
   };
 
   const handleGoBack = () => {
-    navigate("/dashboard", { replace: true });
+    if (onClose) onClose();
+    else navigate("/dashboard", { replace: true });
   };
 
   return (
     <div className="d-flex flex-column align-items-center">
-      <Card className="m-auto bg-dark p-4" style={{ maxWidth: '800px', width: '100%' }}>
+      <Card className="m-auto bg-dark p-4" style={{ maxWidth: '1200px', width: '100%' }}>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
             <Row>
@@ -147,10 +168,11 @@ const NewRoutine = () => {
             <Form.Group className="mb-3">
               <Form.Label>Agregar ejercicio existente</Form.Label>
               <Row>
-                <Col md={8}>
+                <Col md={editingExerciseId ? 5 : 8}>
                   <Form.Select
                     value={selectedExerciseId}
                     onChange={e => setSelectedExerciseId(e.target.value)}
+                    disabled={editingExerciseId !== null}
                   >
                     <option value="">Seleccionar ejercicio...</option>
                     {availableExercises.map(ex => (
@@ -160,12 +182,116 @@ const NewRoutine = () => {
                     ))}
                   </Form.Select>
                 </Col>
-                <Col md={4}>
-                  <Button onClick={handleAddExistingExercise} variant="info" className="w-100">
+                <Col md={editingExerciseId ? 7 : 4} className="d-flex gap-2">
+                  <Button
+                    onClick={handleAddExistingExercise}
+                    variant="info"
+                    className="w-100"
+                    disabled={editingExerciseId !== null}
+                  >
                     Agregar existente
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (!selectedExerciseId) return toast.info("Selecciona un ejercicio para modificar");
+                      const ex = availableExercises.find(e => e.id === parseInt(selectedExerciseId));
+                      if (!ex) return toast.error("Ejercicio no encontrado");
+                      setEditingExerciseId(ex.id);
+                      setEditSets(ex.sets);
+                      setEditRepetitions(ex.repetitions);
+                    }}
+                    variant="warning"
+                    className="w-100"
+                    disabled={editingExerciseId !== null}
+                  >
+                    Modificar ejercicio
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (!selectedExerciseId) return toast.info("Selecciona un ejercicio para eliminar");
+                      const ex = availableExercises.find(e => e.id === parseInt(selectedExerciseId));
+                      if (!ex) return toast.error("Ejercicio no encontrado");
+                      setExerciseToDelete(ex);
+                      setShowDeleteModal(true);
+                    }}
+                    variant="danger"
+                    className="w-100"
+                    disabled={editingExerciseId !== null}
+                  >
+                    Eliminar ejercicio
                   </Button>
                 </Col>
               </Row>
+              {/* Edición en línea */}
+              {editingExerciseId && (
+                <Row className="mt-3 align-items-end">
+                  <Col md={5}>
+                    <Form.Label>Series</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={editSets}
+                      onChange={e => setEditSets(e.target.value)}
+                      min={1}
+                    />
+                  </Col>
+                  <Col md={5}>
+                    <Form.Label>Repeticiones</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={editRepetitions}
+                      onChange={e => setEditRepetitions(e.target.value)}
+                      min={1}
+                    />
+                  </Col>
+                  <Col md={2} className="d-flex gap-2">
+                    <Button
+                      variant="primary"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              sets: parseInt(editSets),
+                              repetitions: parseInt(editRepetitions),
+                            }),
+                          });
+                          if (res.ok) {
+                            setAvailableExercises(prev =>
+                              prev.map(e =>
+                                e.id === editingExerciseId
+                                  ? { ...e, sets: parseInt(editSets), repetitions: parseInt(editRepetitions) }
+                                  : e
+                              )
+                            );
+                            setExercises(prev =>
+                              prev.map(e =>
+                                e.id === editingExerciseId
+                                  ? { ...e, sets: parseInt(editSets), repetitions: parseInt(editRepetitions) }
+                                  : e
+                              )
+                            );
+                            toast.success("Ejercicio modificado correctamente");
+                            setEditingExerciseId(null);
+                          } else {
+                            toast.error("Error al modificar el ejercicio");
+                          }
+                        } catch {
+                          toast.error("Error de conexión al modificar");
+                        }
+                      }}
+                    >
+                      Guardar
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setEditingExerciseId(null)}
+                    >
+                      Cancelar
+                    </Button>
+                  </Col>
+                </Row>
+              )}
             </Form.Group>
 
             {/* Agregar ejercicio nuevo */}
@@ -223,14 +349,69 @@ const NewRoutine = () => {
             )}
 
             <Button type="submit" variant="success" className="mb-2 w-100">
-              Crear Rutina
+              {isEditMode ? "Guardar cambios" : "Crear Rutina"}
             </Button>
             <Button variant="outline-secondary" onClick={handleGoBack} className="w-100">
-              Volver
+              Cancelar
             </Button>
           </Form>
         </Card.Body>
       </Card>
+
+      {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 8,
+            padding: 32,
+            minWidth: 320,
+            textAlign: 'center',
+            boxShadow: '0 0 24px rgba(0,0,0,0.3)'
+          }}>
+            <h5 style={{marginBottom: 24}}>¿Desea eliminar el ejercicio "{exerciseToDelete?.name}"?</h5>
+            <div className="d-flex justify-content-center gap-3">
+              <Button
+                variant="danger"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
+                    if (res.ok) {
+                      setAvailableExercises(prev => prev.filter(ej => ej.id !== exerciseToDelete.id));
+                      setSelectedExerciseId("");
+                      setShowDeleteModal(false);
+                      setExerciseToDelete(null);
+                      toast.success("Ejercicio eliminado correctamente");
+                    } else {
+                      toast.error("No se puede eliminar un ejercicio que posee rutinas asociadas");
+                    }
+                  } catch {
+                    toast.error("Error de conexión al eliminar");
+                  }
+                }}
+              >Eliminar</Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setExerciseToDelete(null);
+                }}
+              >Cancelar</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
