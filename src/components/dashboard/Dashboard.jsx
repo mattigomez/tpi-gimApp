@@ -3,18 +3,19 @@ import { Route, Routes } from "react-router";
 import Routines from "../routines/Routines";
 import NewRoutine from "../newRoutine/NewRoutine";
 import Header from "../header/Header";
+import { authFetch } from "../../services/authFetch";
 
 const Dashboard = ({ onLogout }) => {
   const [routines, setRoutines] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/routines")
+    authFetch("http://localhost:3000/routines")
       .then(res => res.json())
       .then(data => setRoutines(data));
   }, []);
 
   const refreshRoutines = () => {
-    fetch("http://localhost:3000/routines")
+    authFetch("http://localhost:3000/routines")
       .then(res => res.json())
       .then(data => setRoutines(data));
   };

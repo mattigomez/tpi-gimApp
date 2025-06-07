@@ -26,7 +26,7 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="login" />} />
-          <Route path="login" element={<Login onLogin={handleSignIn} />} />
+          <Route path="/login" element={<Login onLogin={handleSignIn} />} />
           <Route element={<Protected isSignedIn={isSignedIn} />}>
             <Route path="/home/*" element={<Home onLogout={handleLogout} />} />
             <Route path="/dashboard/*" element={<Dashboard />} />

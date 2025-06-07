@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import Header from "../header/Header";
+import { authFetch } from "../../services/authFetch";
 
 const Partners = () => {
   const [partners, setPartners] = useState([]);
@@ -16,7 +17,7 @@ const Partners = () => {
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
-    role: "cliente",
+    role: "user",
   });
   const navigate = useNavigate();
 
@@ -25,7 +26,7 @@ const Partners = () => {
 
   // Traer socios y rutinas
   useEffect(() => {
-    fetch("http://localhost:3000/partners")
+    authFetch("http://localhost:3000/partners")
       .then((res) => res.json())
       .then((data) => {
         setPartners(data);
@@ -113,7 +114,7 @@ const Partners = () => {
       if (res.ok) {
         toast.success("Usuario creado correctamente");
         setShowAddUserModal(false);
-        setNewUser({ email: "", password: "", role: "cliente" });
+        setNewUser({ email: "", password: "", role: "user" });
         // Refrescar lista de socios
         fetch("http://localhost:3000/partners")
           .then((res) => res.json())
@@ -178,7 +179,7 @@ const Partners = () => {
                         <b>Email:</b> {p.email}
                       </div>
                       {/* Mostrar rutina activa solo si el usuario NO es profesor */}
-                      {p.role !== "profesor" && (
+                      {p.role !== "trainer" && (
                         <div className="mt-2">
                           <b>Rutina activa:</b>{" "}
                           {activeRoutines[p.id] &&
@@ -194,7 +195,7 @@ const Partners = () => {
                           )}
                           {/* Desplegable solo para admin o profesor */}
                           {(userRole === "admin" ||
-                            userRole === "profesor") && (
+                            userRole === "trainer") && (
                             <div className="mt-2">
                               <select
                                 value={activeRoutines[p.id]?.id || ""}
@@ -292,8 +293,8 @@ const Partners = () => {
                 onChange={handleNewUserChange}
                 className="bg-dark text-white"
               >
-                <option value="cliente">Cliente</option>
-                <option value="profesor">Profesor</option>
+                <option value="user">Cliente</option>
+                <option value="trainer">Profesor</option>
               </Form.Select>
             </Form.Group>
           </Form>
