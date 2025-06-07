@@ -74,7 +74,7 @@ const Login = ({ onLogin }) => {
       }));
       return;
     }
-
+    onLogin();
     fetch("http://localhost:3000/login", {
       headers: {
         "Content-type": "application/json",
@@ -85,28 +85,14 @@ const Login = ({ onLogin }) => {
         password,
       }),
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error("Credenciales incorrectas");
-        }
-
-        return res.text();
-      })
-      .then((data) => {
-        console.log(`el token es: ${data}`);
-        if (data) {
-          localStorage.setItem("GymHub-token", data);
+      .then((res) => res.json())
+      .then((token) => {
+        console.log(`el token es: ${token}`);
+          localStorage.setItem("GymHub-token", token);
           toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
-          onLogin();
           navigate("/home");
-        } else {
-          toast.error("Credenciales incorrectas");
-        }
-      })
-      .catch((err) => {
-        toast.error(err.message || "Error de conexión");
-      });
-  };
+  });
+};
   return (
     <Card className="mt-5 mx-3 p-3 px-5 shadow">
       <Card.Body>

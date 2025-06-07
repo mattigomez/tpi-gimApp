@@ -4,7 +4,7 @@ import Header from "../header/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Account = ({ userEmail }) => {
+const Account = ({ userEmail,onLogout }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -81,7 +81,7 @@ const Account = ({ userEmail }) => {
 
   return (
     <>
-      <Header />
+      <Header onLogout={onLogout} />
       <div
         style={{
           minHeight: "100vh",
