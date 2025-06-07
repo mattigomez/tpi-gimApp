@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
 
-const Partners = () => {
+const Partners = ({onLogout}) => {
   const [partners, setPartners] = useState([]);
   const [activeRoutines, setActiveRoutines] = useState({});
   const [routines, setRoutines] = useState([]);
@@ -39,7 +39,11 @@ const Partners = () => {
       });
 
     // Traer todas las rutinas
-    fetch("http://localhost:3000/routines")
+    fetch("http://localhost:3000/routines", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setRoutines(data))
       .catch((err) => console.error(err));
@@ -47,7 +51,11 @@ const Partners = () => {
 
   // Traer rutina activa de un socio
   const fetchActiveRoutine = (id) => {
-    fetch(`http://localhost:3000/partners/${id}/active-routine`)
+    fetch(`http://localhost:3000/partners/${id}/active-routine`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+      },
+    })
       .then((res) => res.json())
       .then((routine) => {
         setActiveRoutines((prev) => ({ ...prev, [id]: routine }));
@@ -59,7 +67,10 @@ const Partners = () => {
   const handleRoutineChange = (partnerId, routineId) => {
     fetch(`http://localhost:3000/partners/${partnerId}/active-routine`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+      },
       body: JSON.stringify({ routineId }),
     })
       .then((res) => res.json())
@@ -78,7 +89,12 @@ const Partners = () => {
 
   // Confirmar eliminación
   const handleConfirmDelete = () => {
-    fetch(`http://localhost:3000/partners/${selectedId}`, { method: "DELETE" })
+    fetch(`http://localhost:3000/partners/${selectedId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+      },
+    })
       .then((res) => {
         if (res.ok) {
           toast.success("Socio eliminado correctamente");
@@ -108,7 +124,10 @@ const Partners = () => {
     try {
       const res = await fetch("http://localhost:3000/partners", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+        },
         body: JSON.stringify(newUser),
       });
       if (res.ok) {
@@ -116,7 +135,11 @@ const Partners = () => {
         setShowAddUserModal(false);
         setNewUser({ email: "", password: "", role: "user" });
         // Refrescar lista de socios
-        fetch("http://localhost:3000/partners")
+        fetch("http://localhost:3000/partners", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+          },
+        })
           .then((res) => res.json())
           .then((data) => setPartners(data));
       } else {
@@ -137,7 +160,7 @@ const Partners = () => {
       className="d-flex flex-column align-items-center"
       style={{ marginTop: "120px" }}
     >
-      <Header />
+      <Header onLogout={onLogout} />
       <Card
         className="m-auto bg-dark p-4"
         style={{ maxWidth: "1500px", width: "100%" }}

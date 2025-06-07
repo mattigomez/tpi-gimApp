@@ -116,6 +116,7 @@ const res = await fetch("http://localhost:3000/login", {
               onChange={handleEmailChange}
               value={email}
               ref={emailRef}
+              autoComplete="current-email"
             />
             {errors.email && (
               <p className="text-danger">El correo no es valido</p>
@@ -128,6 +129,7 @@ const res = await fetch("http://localhost:3000/login", {
               onChange={handlePasswordChange}
               value={password}
               ref={passwordRef}
+              autoComplete="current-password"
             />
             {errors.password && (
               <p className="text-danger">La contraseña no es válida</p>

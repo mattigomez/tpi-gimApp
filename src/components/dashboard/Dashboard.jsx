@@ -22,7 +22,9 @@ const Dashboard = ({ onLogout }) => {
 
   useEffect(() => {
     window.refreshRoutines = refreshRoutines;
-    return () => { window.refreshRoutines = null; };
+    return () => {
+      window.refreshRoutines = null;
+    };
   }, []);
 
   return (
@@ -39,19 +41,10 @@ const Dashboard = ({ onLogout }) => {
       <Header onLogout={onLogout} />
       <h2>Tus rutinas</h2>
       <Routes>
-        <Route
-          index
-          element={
-            <Routines routines={routines} />
-          }
-        />
+        <Route index element={<Routines routines={routines} />} />
         <Route
           path="add-routine"
-          element={
-            <NewRoutine
-              onAddRoutine={refreshRoutines}
-            />
-          }
+          element={<NewRoutine onAddRoutine={refreshRoutines} />}
         />
       </Routes>
     </div>

@@ -26,7 +26,7 @@ const Header = ({ onLogout }) => {
   return (
     <Navbar fixed="top" expand="lg" bg="dark" data-bs-theme="dark">
       <Container>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="home">
           <img
             src="/src/assets/logowhite-GYMHUB.png"
             alt="GYMHUB Logo"

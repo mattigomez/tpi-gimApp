@@ -18,6 +18,7 @@ const App = () => {
 
   const handleLogout = () => {
     setIsSignedIn(false);
+    localStorage.removeItem("GymHub-Token")
   };
 
   return (
@@ -32,7 +33,7 @@ const App = () => {
             <Route path="/dashboard/*" element={<Dashboard />} />
           </Route>
           <Route path="/account" element={<Account />} />
-          <Route path="/partners" element={<Partners />} />
+          <Route path="/partners" element={<Partners  />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
