@@ -249,7 +249,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                       variant="primary"
                       onClick={async () => {
                         try {
-                          const res = await fetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
+                          const res = await authFetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
@@ -387,7 +387,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                 variant="danger"
                 onClick={async () => {
                   try {
-                    const res = await fetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
+                    const res = await authFetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
                     if (res.ok) {
                       setAvailableExercises(prev => prev.filter(ej => ej.id !== exerciseToDelete.id));
                       setSelectedExerciseId("");

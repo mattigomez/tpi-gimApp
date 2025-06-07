@@ -3,6 +3,7 @@ import { Form, Button, Card } from "react-bootstrap";
 import Header from "../header/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { authFetch } from "../../services/authFetch";
 
 const Account = ({ userEmail, onLogout }) => {
   const [formData, setFormData] = useState({
@@ -57,13 +58,12 @@ const Account = ({ userEmail, onLogout }) => {
     }
 
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `http://localhost:3000/users/${formData.correo}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
           },
           body: JSON.stringify(payload),
         }

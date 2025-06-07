@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
 
-const Partners = ({onLogout}) => {
+const Partners = ({ onLogout }) => {
   const [partners, setPartners] = useState([]);
   const [activeRoutines, setActiveRoutines] = useState({});
   const [routines, setRoutines] = useState([]);
@@ -31,7 +31,7 @@ const Partners = ({onLogout}) => {
       .then((data) => {
         setPartners(data);
         setLoading(false);
-        data.forEach((p) => fetchActiveRoutine(p.id));
+        if (Array.isArray(data)) data.forEach((p) => fetchActiveRoutine(p.id));
       })
       .catch((err) => {
         console.error(err);
@@ -39,11 +39,7 @@ const Partners = ({onLogout}) => {
       });
 
     // Traer todas las rutinas
-    fetch("http://localhost:3000/routines", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
-      },
-    })
+    authFetch("http://localhost:3000/routines")
       .then((res) => res.json())
       .then((data) => setRoutines(data))
       .catch((err) => console.error(err));
@@ -51,11 +47,7 @@ const Partners = ({onLogout}) => {
 
   // Traer rutina activa de un socio
   const fetchActiveRoutine = (id) => {
-    fetch(`http://localhost:3000/partners/${id}/active-routine`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
-      },
-    })
+    authFetch(`http://localhost:3000/partners/${id}/active-routine`)
       .then((res) => res.json())
       .then((routine) => {
         setActiveRoutines((prev) => ({ ...prev, [id]: routine }));
@@ -65,11 +57,10 @@ const Partners = ({onLogout}) => {
 
   // Cambiar rutina activa
   const handleRoutineChange = (partnerId, routineId) => {
-    fetch(`http://localhost:3000/partners/${partnerId}/active-routine`, {
+    authFetch(`http://localhost:3000/partners/${partnerId}/active-routine`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
       },
       body: JSON.stringify({ routineId }),
     })
@@ -89,11 +80,8 @@ const Partners = ({onLogout}) => {
 
   // Confirmar eliminación
   const handleConfirmDelete = () => {
-    fetch(`http://localhost:3000/partners/${selectedId}`, {
+    authFetch(`http://localhost:3000/partners/${selectedId}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
-      },
     })
       .then((res) => {
         if (res.ok) {
@@ -122,11 +110,10 @@ const Partners = ({onLogout}) => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/partners", {
+      const res = await authFetch("http://localhost:3000/partners", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
         },
         body: JSON.stringify(newUser),
       });
@@ -135,11 +122,7 @@ const Partners = ({onLogout}) => {
         setShowAddUserModal(false);
         setNewUser({ email: "", password: "", role: "user" });
         // Refrescar lista de socios
-        fetch("http://localhost:3000/partners", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
-          },
-        })
+        authFetch("http://localhost:3000/partners")
           .then((res) => res.json())
           .then((data) => setPartners(data));
       } else {
@@ -217,8 +200,7 @@ const Partners = ({onLogout}) => {
                             </span>
                           )}
                           {/* Desplegable solo para admin o profesor */}
-                          {(userRole === "admin" ||
-                            userRole === "trainer") && (
+                          {(userRole === "admin" || userRole === "trainer") && (
                             <div className="mt-2">
                               <select
                                 value={activeRoutines[p.id]?.id || ""}

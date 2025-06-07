@@ -80,15 +80,16 @@ const Login = ({ onLogin }) => {
     // Lógica de login real
     try {
       console.log("Login request:", { email, password });
-const res = await fetch("http://localhost:3000/login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
+      const res = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
       const data = await res.json();
       console.log("Login response:", data);
-      if (res.ok && data.token) {
-        handleUserLogin(data.token); // Guarda el token en contexto y localStorage
+      const token = data.token || (typeof data === "string" ? data : null);
+      if (res.ok && token) {
+        handleUserLogin(token);
         onLogin();
         toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
         navigate("/home");

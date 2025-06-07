@@ -18,7 +18,6 @@ const App = () => {
 
   const handleLogout = () => {
     setIsSignedIn(false);
-    localStorage.removeItem("GymHub-Token")
   };
 
   return (
