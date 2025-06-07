@@ -12,15 +12,16 @@ const Header = ({ onLogout }) => {
   };
   const navigate = useNavigate();
   const handleLogout = () => {
-    onLogout();
-    toast.success("Cierre de sesiòn exitoso", {
-      onClose: () => navigate("/login")
-    });
+    if (typeof onLogout === "function") onLogout();
+    toast.success("Cierre de sesión exitoso");
+    setTimeout(() => {
+      navigate("/login", { replace: true });
+    }, 3000);
   };
   return (
     <Navbar fixed="top" expand="lg" bg="dark" data-bs-theme="dark">
       <Container>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="home">
           <img
             src="/src/assets/logowhite-GYMHUB.png"
             alt="GYMHUB Logo"

@@ -74,11 +74,25 @@ const Login = ({ onLogin }) => {
       }));
       return;
     }
-
     onLogin();
-    toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
-    navigate("/home");
-  };
+    fetch("http://localhost:3000/login", {
+      headers: {
+        "Content-type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((token) => {
+        console.log(`el token es: ${token}`);
+          localStorage.setItem("GymHub-token", token);
+          toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
+          navigate("/home");
+  });
+};
   return (
     <Card className="mt-5 mx-3 p-3 px-5 shadow">
       <Card.Body>
@@ -96,6 +110,7 @@ const Login = ({ onLogin }) => {
               onChange={handleEmailChange}
               value={email}
               ref={emailRef}
+              autoComplete="current-email"
             />
             {errors.email && (
               <p className="text-danger">El correo no es valido</p>
@@ -108,6 +123,7 @@ const Login = ({ onLogin }) => {
               onChange={handlePasswordChange}
               value={password}
               ref={passwordRef}
+              autoComplete="current-password"
             />
             {errors.password && (
               <p className="text-danger">La contraseña no es válida</p>
