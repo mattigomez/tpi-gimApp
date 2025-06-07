@@ -8,20 +8,30 @@ const Dashboard = ({ onLogout }) => {
   const [routines, setRoutines] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/routines")
-      .then(res => res.json())
-      .then(data => setRoutines(data));
+    fetch("http://localhost:3000/routines", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setRoutines(data));
   }, []);
 
   const refreshRoutines = () => {
-    fetch("http://localhost:3000/routines")
-      .then(res => res.json())
-      .then(data => setRoutines(data));
+    fetch("http://localhost:3000/routines", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setRoutines(data));
   };
 
   useEffect(() => {
     window.refreshRoutines = refreshRoutines;
-    return () => { window.refreshRoutines = null; };
+    return () => {
+      window.refreshRoutines = null;
+    };
   }, []);
 
   return (
@@ -38,19 +48,10 @@ const Dashboard = ({ onLogout }) => {
       <Header onLogout={onLogout} />
       <h2>Tus rutinas</h2>
       <Routes>
-        <Route
-          index
-          element={
-            <Routines routines={routines} />
-          }
-        />
+        <Route index element={<Routines routines={routines} />} />
         <Route
           path="add-routine"
-          element={
-            <NewRoutine
-              onAddRoutine={refreshRoutines}
-            />
-          }
+          element={<NewRoutine onAddRoutine={refreshRoutines} />}
         />
       </Routes>
     </div>

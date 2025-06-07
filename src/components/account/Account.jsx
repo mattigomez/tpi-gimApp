@@ -4,7 +4,7 @@ import Header from "../header/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Account = ({ userEmail,onLogout }) => {
+const Account = ({ userEmail, onLogout }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -57,11 +57,17 @@ const Account = ({ userEmail,onLogout }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/users/${formData.correo}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `http://localhost:3000/users/${formData.correo}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("GymHub-token")}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
       if (res.ok) {
         toast.success("Datos guardados correctamente");
         setFormData((prev) => ({
@@ -75,7 +81,7 @@ const Account = ({ userEmail,onLogout }) => {
         toast.error(data.message || "Error al guardar los datos");
       }
     } catch (err) {
-      toast.error(err,"Error de conexión con el servidor");
+      toast.error(err, "Error de conexión con el servidor");
     }
   };
 
