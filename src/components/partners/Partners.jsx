@@ -4,8 +4,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import Header from "../header/Header";
+import { authFetch } from "../../services/authFetch";
 
-const Partners = () => {
+const Partners = ({ onLogout }) => {
   const [partners, setPartners] = useState([]);
   const [activeRoutines, setActiveRoutines] = useState({});
   const [routines, setRoutines] = useState([]);
@@ -16,7 +17,7 @@ const Partners = () => {
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
-    role: "cliente",
+    role: "user",
   });
   const navigate = useNavigate();
 
@@ -25,12 +26,12 @@ const Partners = () => {
 
   // Traer socios y rutinas
   useEffect(() => {
-    fetch("http://localhost:3000/partners")
+    authFetch("http://localhost:3000/partners")
       .then((res) => res.json())
       .then((data) => {
         setPartners(data);
         setLoading(false);
-        data.forEach((p) => fetchActiveRoutine(p.id));
+        if (Array.isArray(data)) data.forEach((p) => fetchActiveRoutine(p.id));
       })
       .catch((err) => {
         console.error(err);
@@ -38,7 +39,7 @@ const Partners = () => {
       });
 
     // Traer todas las rutinas
-    fetch("http://localhost:3000/routines")
+    authFetch("http://localhost:3000/routines")
       .then((res) => res.json())
       .then((data) => setRoutines(data))
       .catch((err) => console.error(err));
@@ -46,7 +47,7 @@ const Partners = () => {
 
   // Traer rutina activa de un socio
   const fetchActiveRoutine = (id) => {
-    fetch(`http://localhost:3000/partners/${id}/active-routine`)
+    authFetch(`http://localhost:3000/partners/${id}/active-routine`)
       .then((res) => res.json())
       .then((routine) => {
         setActiveRoutines((prev) => ({ ...prev, [id]: routine }));
@@ -56,9 +57,11 @@ const Partners = () => {
 
   // Cambiar rutina activa
   const handleRoutineChange = (partnerId, routineId) => {
-    fetch(`http://localhost:3000/partners/${partnerId}/active-routine`, {
+    authFetch(`http://localhost:3000/partners/${partnerId}/active-routine`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ routineId }),
     })
       .then((res) => res.json())
@@ -77,7 +80,9 @@ const Partners = () => {
 
   // Confirmar eliminación
   const handleConfirmDelete = () => {
-    fetch(`http://localhost:3000/partners/${selectedId}`, { method: "DELETE" })
+    authFetch(`http://localhost:3000/partners/${selectedId}`, {
+      method: "DELETE",
+    })
       .then((res) => {
         if (res.ok) {
           toast.success("Socio eliminado correctamente");
@@ -105,17 +110,19 @@ const Partners = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/partners", {
+      const res = await authFetch("http://localhost:3000/partners", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(newUser),
       });
       if (res.ok) {
         toast.success("Usuario creado correctamente");
         setShowAddUserModal(false);
-        setNewUser({ email: "", password: "", role: "cliente" });
+        setNewUser({ email: "", password: "", role: "user" });
         // Refrescar lista de socios
-        fetch("http://localhost:3000/partners")
+        authFetch("http://localhost:3000/partners")
           .then((res) => res.json())
           .then((data) => setPartners(data));
       } else {
@@ -136,7 +143,7 @@ const Partners = () => {
       className="d-flex flex-column align-items-center"
       style={{ marginTop: "120px" }}
     >
-      <Header />
+      <Header onLogout={onLogout} />
       <Card
         className="m-auto bg-dark p-4"
         style={{ maxWidth: "1500px", width: "100%" }}
@@ -178,7 +185,7 @@ const Partners = () => {
                         <b>Email:</b> {p.email}
                       </div>
                       {/* Mostrar rutina activa solo si el usuario NO es profesor */}
-                      {p.role !== "profesor" && (
+                      {p.role !== "trainer" && (
                         <div className="mt-2">
                           <b>Rutina activa:</b>{" "}
                           {activeRoutines[p.id] &&
@@ -193,8 +200,7 @@ const Partners = () => {
                             </span>
                           )}
                           {/* Desplegable solo para admin o profesor */}
-                          {(userRole === "admin" ||
-                            userRole === "profesor") && (
+                          {(userRole === "admin" || userRole === "trainer") && (
                             <div className="mt-2">
                               <select
                                 value={activeRoutines[p.id]?.id || ""}
@@ -292,8 +298,8 @@ const Partners = () => {
                 onChange={handleNewUserChange}
                 className="bg-dark text-white"
               >
-                <option value="cliente">Cliente</option>
-                <option value="profesor">Profesor</option>
+                <option value="user">Cliente</option>
+                <option value="trainer">Profesor</option>
               </Form.Select>
             </Form.Group>
           </Form>

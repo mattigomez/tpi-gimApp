@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { AuthContext } from "../../../services/authContext/Auth.context";
 
 import "./Login.css";
 
@@ -15,6 +16,7 @@ const Login = ({ onLogin }) => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const navigate = useNavigate();
+  const { handleUserLogin } = useContext(AuthContext);
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,7 +46,7 @@ const Login = ({ onLogin }) => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (email.trim() === "") {
@@ -75,9 +77,28 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    onLogin();
-    toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
-    navigate("/home");
+    // Lógica de login real
+    try {
+      console.log("Login request:", { email, password });
+      const res = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      console.log("Login response:", data);
+      const token = data.token || (typeof data === "string" ? data : null);
+      if (res.ok && token) {
+        handleUserLogin(token);
+        onLogin();
+        toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
+        navigate("/home");
+      } else {
+        toast.error(data.message || "Credenciales incorrectas");
+      }
+    } catch {
+      toast.error("Error de conexión");
+    }
   };
   return (
     <Card className="mt-5 mx-3 p-3 px-5 shadow">
@@ -96,6 +117,7 @@ const Login = ({ onLogin }) => {
               onChange={handleEmailChange}
               value={email}
               ref={emailRef}
+              autoComplete="current-email"
             />
             {errors.email && (
               <p className="text-danger">El correo no es valido</p>
@@ -108,6 +130,7 @@ const Login = ({ onLogin }) => {
               onChange={handlePasswordChange}
               value={password}
               ref={passwordRef}
+              autoComplete="current-password"
             />
             {errors.password && (
               <p className="text-danger">La contraseña no es válida</p>

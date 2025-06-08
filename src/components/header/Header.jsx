@@ -3,24 +3,30 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { toast } from "react-toastify";
-
 import { useNavigate } from "react-router";
+import { useContext } from "react";
+import { AuthContext } from "../../services/authContext/Auth.context";
 
 const Header = ({ onLogout }) => {
+  const navigate = useNavigate();
+  const { handleUserLogout } = useContext(AuthContext);
+
   const handleNavigateHome = () => {
     navigate("/home", { replace: true });
   };
-  const navigate = useNavigate();
+
   const handleLogout = () => {
+    handleUserLogout(); // Borra el token
     onLogout();
     toast.success("Cierre de sesiòn exitoso", {
       onClose: () => navigate("/login")
     });
   };
+
   return (
     <Navbar fixed="top" expand="lg" bg="dark" data-bs-theme="dark">
       <Container>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="home">
           <img
             src="/src/assets/logowhite-GYMHUB.png"
             alt="GYMHUB Logo"

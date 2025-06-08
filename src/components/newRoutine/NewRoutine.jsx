@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { authFetch } from "../../services/authFetch";
 
 const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const [title, setTitle] = useState(initialData?.title || "");
@@ -22,7 +23,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
 
   // Traer ejercicios existentes al montar
   useEffect(() => {
-    fetch("http://localhost:3000/exercises")
+    authFetch("http://localhost:3000/exercises")
       .then(res => res.json())
       .then(data => setAvailableExercises(data));
   }, []);
@@ -86,13 +87,13 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     try {
       let res;
       if (isEditMode && initialData?.id) {
-        res = await fetch(`http://localhost:3000/routines/${initialData.id}` , {
+        res = await authFetch(`http://localhost:3000/routines/${initialData.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(routineData),
         });
       } else {
-        res = await fetch("http://localhost:3000/routines", {
+        res = await authFetch("http://localhost:3000/routines", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(routineData),
@@ -248,7 +249,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                       variant="primary"
                       onClick={async () => {
                         try {
-                          const res = await fetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
+                          const res = await authFetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
@@ -386,7 +387,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                 variant="danger"
                 onClick={async () => {
                   try {
-                    const res = await fetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
+                    const res = await authFetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
                     if (res.ok) {
                       setAvailableExercises(prev => prev.filter(ej => ej.id !== exerciseToDelete.id));
                       setSelectedExerciseId("");

@@ -3,8 +3,9 @@ import { Form, Button, Card } from "react-bootstrap";
 import Header from "../header/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { authFetch } from "../../services/authFetch";
 
-const Account = ({ userEmail }) => {
+const Account = ({ userEmail, onLogout }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -57,11 +58,16 @@ const Account = ({ userEmail }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/users/${formData.correo}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await authFetch(
+        `http://localhost:3000/users/${formData.correo}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
       if (res.ok) {
         toast.success("Datos guardados correctamente");
         setFormData((prev) => ({
@@ -75,13 +81,13 @@ const Account = ({ userEmail }) => {
         toast.error(data.message || "Error al guardar los datos");
       }
     } catch (err) {
-      toast.error(err,"Error de conexión con el servidor");
+      toast.error(err, "Error de conexión con el servidor");
     }
   };
 
   return (
     <>
-      <Header />
+      <Header onLogout={onLogout} />
       <div
         style={{
           minHeight: "100vh",

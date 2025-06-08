@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, Button, Badge, ListGroup } from "react-bootstrap";
 import { PencilSquare, XCircle } from "react-bootstrap-icons";
 import NewRoutine from "../newRoutine/NewRoutine";
+import { authFetch } from "../../services/authFetch";
 import './routineItem.css';
 
 const RoutineItem = ({
@@ -28,7 +29,7 @@ const RoutineItem = ({
 
     const handleDelete = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/routines/${id}`, { method: "DELETE" });
+            const res = await authFetch(`http://localhost:3000/routines/${id}`, { method: "DELETE" });
             if (res.ok) {
                 setShowDeleteModal(false);
                 if (refreshRoutines) refreshRoutines();
