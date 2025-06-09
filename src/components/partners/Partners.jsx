@@ -65,9 +65,15 @@ const Partners = ({ onLogout }) => {
       body: JSON.stringify({ routineId }),
     })
       .then((res) => res.json())
-      .then(() => {
+      .then((data) => {
+        // Si el backend devuelve un nuevo token, guárdalo
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
         fetchActiveRoutine(partnerId);
         toast.success("Rutina activa actualizada");
+        // Notificar a otras vistas que la rutina fue cambiada
+        localStorage.setItem("routine-assigned-updated", Date.now());
       })
       .catch(() => toast.error("Error al actualizar rutina"));
   };

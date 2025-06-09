@@ -10,7 +10,6 @@ const RoutineItem = ({
     description,
     level,
     exercises,
-    onRoutineSelected,
     id,
     refreshRoutines
 }) => {
@@ -18,9 +17,7 @@ const RoutineItem = ({
     const [editData, setEditData] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    const handleSelectRoutine = () => {
-        onRoutineSelected(title);
-    };
+  
 
     const handleEdit = () => {
         setEditData({ id, title, description, level, exercises });
@@ -73,7 +70,6 @@ const RoutineItem = ({
                     ))}
                 </ListGroup>
 
-                <Button onClick={handleSelectRoutine}>Seleccionar rutina</Button>
             </Card.Body>
         </Card>
         {showEditModal && (
