@@ -1,11 +1,13 @@
-import { Card, ListGroup, Button, Spinner, Modal, Form } from "react-bootstrap";
+import { Card, Button, Spinner, Modal, Form, Row, Col } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
 import { validateEmail, validatePassword } from "../auth/auth.services";
+import { AuthContext } from "../../services/authContext/Auth.context";
+import { jwtDecode } from "../../services/jwtDecode";
 
 const Partners = ({ handleLogout }) => {
   const [partners, setPartners] = useState([]);
@@ -20,10 +22,16 @@ const Partners = ({ handleLogout }) => {
     password: "",
     role: "user",
   });
+  const [search, setSearch] = useState(""); // Nuevo estado para el buscador
   const navigate = useNavigate();
 
-  // Simula el usuario logueado (reemplaza por tu lógica real)
-  const userRole = "admin"; // o "profesor", o traelo de tu auth
+  // Obtener el rol del usuario desde el token
+  const { token } = useContext(AuthContext);
+  let userRole = null;
+  if (token) {
+    const user = jwtDecode(token);
+    userRole = user?.role;
+  }
 
   // Traer socios y rutinas
   useEffect(() => {
@@ -158,98 +166,131 @@ const Partners = ({ handleLogout }) => {
     navigate("/home", { replace: true });
   };
 
+  // Filtrado de socios según el texto de búsqueda
+  const filteredPartners = partners.filter((p) => {
+    const text = `${p.nombre} ${p.apellido} ${p.email} ${p.telefono}`.toLowerCase();
+    return text.includes(search.toLowerCase());
+  });
+
   return (
     <div
       className="d-flex flex-column align-items-center"
       style={{ marginTop: "120px" }}
     >
       <Header onLogout={handleLogout} />
+      {/* Buscador centrado y de tamaño normal */}
+      <div className="d-flex justify-content-center mb-3" style={{ width: "100%" }}>
+        <Form.Control
+          type="text"
+          placeholder="Buscar socio por nombre, apellido, email o teléfono..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ maxWidth: 400 }}
+        />
+      </div>
       <Card
         className="m-auto bg-dark p-4"
         style={{ maxWidth: "1500px", width: "100%" }}
       >
         <Card.Body>
           <div className="d-flex justify-content-end mb-3">
-            <Button variant="success" onClick={() => setShowAddUserModal(true)}>
-              Agregar usuario
-            </Button>
+            {userRole === "admin" && (
+              <Button variant="success" onClick={() => setShowAddUserModal(true)}>
+                Agregar usuario
+              </Button>
+            )}
           </div>
-          <Card.Title className="mb-4">Lista de Socios</Card.Title>
+          {/* Título centrado */}
+          <Card.Title className="mb-4 text-center">Lista de Socios</Card.Title>
           {loading ? (
             <Spinner animation="border" />
           ) : (
-            <ListGroup variant="flush">
-              {partners.map((p) => (
-                <ListGroup.Item
+            <Row className="justify-content-center">
+              {filteredPartners.map((p) => (
+                <Col
                   key={p.id}
-                  className="bg-dark text-white mb-3 border rounded"
+                  md={
+                    filteredPartners.length === 1
+                      ? 12
+                      : filteredPartners.length === 2
+                      ? 6
+                      : 4
+                  }
+                  className="mb-4 d-flex justify-content-center"
+                  style={
+                    filteredPartners.length === 1 || filteredPartners.length === 2
+                      ? { maxWidth: 400 }
+                      : {}
+                  }
                 >
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
+                  <Card className="bg-dark text-white h-100 border rounded w-100">
+                    <Card.Body>
                       <div>
-                        <b>Nombre:</b> {p.nombre} {p.apellido}
-                      </div>
-                      <div>
-                        <b>Edad:</b> {p.edad} años
-                      </div>
-                      <div>
-                        <b>Estatura:</b> {p.estatura} cm
-                      </div>
-                      <div>
-                        <b>Peso:</b> {p.peso} kg
-                      </div>
-                      <div>
-                        <b>Teléfono:</b> {p.telefono}
-                      </div>
-                      <div>
-                        <b>Email:</b> {p.email}
-                      </div>
-                      {/* Mostrar rutina activa solo si el usuario NO es profesor */}
-                      {p.role !== "trainer" && (
-                        <div className="mt-2">
-                          <b>Rutina activa:</b>{" "}
-                          {activeRoutines[p.id] &&
-                          activeRoutines[p.id]?.title ? (
-                            <span>
-                              {activeRoutines[p.id].title} (
-                              {activeRoutines[p.id].level})
-                            </span>
-                          ) : (
-                            <span className="text-warning">
-                              Sin rutina activa
-                            </span>
-                          )}
-                          {/* Desplegable solo para admin o profesor */}
-                          {(userRole === "admin" || userRole === "trainer") && (
-                            <div className="mt-2">
-                              <select
-                                value={activeRoutines[p.id]?.id || ""}
-                                onChange={(e) =>
-                                  handleRoutineChange(p.id, e.target.value)
-                                }
-                              >
-                                <option value="">Seleccionar rutina</option>
-                                {routines.map((r) => (
-                                  <option key={r.id} value={r.id}>
-                                    {r.title} ({r.level})
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
+                        <div>
+                          <b>Nombre:</b> {p.nombre} {p.apellido}
                         </div>
+                        <div>
+                          <b>Edad:</b> {p.edad} años
+                        </div>
+                        <div>
+                          <b>Estatura:</b> {p.estatura} cm
+                        </div>
+                        <div>
+                          <b>Peso:</b> {p.peso} kg
+                        </div>
+                        <div>
+                          <b>Teléfono:</b> {p.telefono}
+                        </div>
+                        <div>
+                          <b>Email:</b> {p.email}
+                        </div>
+                        {p.role !== "trainer" && (
+                          <div className="mt-2">
+                            <b>Rutina activa:</b>{" "}
+                            {activeRoutines[p.id] && activeRoutines[p.id]?.title ? (
+                              <span>
+                                {activeRoutines[p.id].title} (
+                                {activeRoutines[p.id].level})
+                              </span>
+                            ) : (
+                              <span className="text-warning">Sin rutina activa</span>
+                            )}
+                            {(userRole === "admin" || userRole === "trainer") && (
+                              <div className="mt-2">
+                                <select
+                                  value={activeRoutines[p.id]?.id || ""}
+                                  onChange={(e) =>
+                                    handleRoutineChange(p.id, e.target.value)
+                                  }
+                                >
+                                  <option value="">Seleccionar rutina</option>
+                                  {routines.map((r) => (
+                                    <option key={r.id} value={r.id}>
+                                      {r.title} ({r.level})
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </Card.Body>
+                    <Card.Footer className="bg-dark border-0">
+                      {(userRole === "admin") && (
+                        <Button
+                          variant="danger"
+                          onClick={() => handleShowModal(p.id)}
+                          className="w-100"
+                        >
+                          Eliminar
+                        </Button>
                       )}
-                    </div>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleShowModal(p.id)}
-                    >
-                      Eliminar
-                    </Button>
-                  </div>
-                </ListGroup.Item>
+                    </Card.Footer>
+                  </Card>
+                </Col>
               ))}
-            </ListGroup>
+            </Row>
           )}
           <Button
             variant="outline-secondary"
