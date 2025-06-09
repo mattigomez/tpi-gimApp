@@ -2,12 +2,9 @@ import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import Header from "../header/Header";
 
-const Home = ({ userType}) => {
+const Home = ({ userType, handleLogout}) => {
   const navigate = useNavigate();
   
-  const handleLogout = () => { 
-    navigate("/login", { replace: true });
-  }
   return (
     <div
       style={{
