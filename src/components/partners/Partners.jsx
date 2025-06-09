@@ -5,8 +5,9 @@ import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
+import { validateEmail, validatePassword } from "../auth/auth.services";
 
-const Partners = ({ onLogout }) => {
+const Partners = ({ handleLogout }) => {
   const [partners, setPartners] = useState([]);
   const [activeRoutines, setActiveRoutines] = useState({});
   const [routines, setRoutines] = useState([]);
@@ -105,8 +106,21 @@ const Partners = ({ onLogout }) => {
   };
 
   const handleAddUser = async () => {
-    if (!newUser.email || !newUser.password) {
-      toast.error("Email y contraseña son obligatorios");
+    if (!newUser.email || newUser.email.trim() === "") {
+      toast.error("El correo es obligatorio");
+      return;
+    }
+    if (!validateEmail(newUser.email)) {
+      toast.error("El formato del correo no es válido");
+      return;
+    }
+    if (!newUser.password || newUser.password.trim() === "") {
+      toast.error("La contraseña es obligatoria");
+      return;
+    }
+    const passwordError = validatePassword(newUser.password);
+    if (passwordError) {
+      toast.error(passwordError);
       return;
     }
     try {
@@ -143,7 +157,7 @@ const Partners = ({ onLogout }) => {
       className="d-flex flex-column align-items-center"
       style={{ marginTop: "120px" }}
     >
-      <Header onLogout={onLogout} />
+      <Header onLogout={handleLogout} />
       <Card
         className="m-auto bg-dark p-4"
         style={{ maxWidth: "1500px", width: "100%" }}

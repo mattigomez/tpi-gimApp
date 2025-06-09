@@ -5,7 +5,7 @@ import NewRoutine from "../newRoutine/NewRoutine";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
 
-const Dashboard = ({ onLogout }) => {
+const Dashboard = ({ handleLogout }) => {
   const [routines, setRoutines] = useState([]);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Dashboard = ({ onLogout }) => {
         padding: "100px",
       }}
     >
-      <Header onLogout={onLogout} />
+      <Header onLogout={handleLogout} />
       <h2>Tus rutinas</h2>
       <Routes>
         <Route index element={<Routines routines={routines} />} />

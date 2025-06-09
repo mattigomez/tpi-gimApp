@@ -3,6 +3,7 @@ import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../../services/authContext/Auth.context";
+import { validateEmail, validatePassword} from "../auth.services"
 
 import "./Login.css";
 
@@ -17,22 +18,6 @@ const Login = ({ onLogin }) => {
   const passwordRef = useRef(null);
   const navigate = useNavigate();
   const { handleUserLogin } = useContext(AuthContext);
-
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-  const validatePassword = (password) => {
-    if (password.trim() === "") return "La contraseña está vacía";
-    if (password.length < 6)
-      return "La contraseña debe tener al menos 6 caracteres";
-    if (!/[A-Z]/.test(password))
-      return "Debe tener al menos una letra mayúscula";
-    if (!/[a-z]/.test(password))
-      return "Debe tener al menos una letra minúscula";
-    if (!/\d/.test(password)) return "Debe tener al menos un número";
-    return "";
-  };
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -104,7 +89,7 @@ const Login = ({ onLogin }) => {
     <Card className="mt-5 mx-3 p-3 px-5 shadow">
       <Card.Body>
         <Row className="mb-2">
-          <h5>GimHub</h5>
+          <h5>GymHub</h5>
         </Row>
         <Form onSubmit={handleSubmit}>
           <FormGroup className="mb-4">

@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authFetch } from "../../services/authFetch";
 
-const Account = ({ userEmail, onLogout }) => {
+const Account = ({ userEmail,handleLogout }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -87,12 +87,12 @@ const Account = ({ userEmail, onLogout }) => {
 
   return (
     <>
-      <Header onLogout={onLogout} />
+      <Header onLogout={handleLogout} />
       <div
         style={{
           minHeight: "100vh",
           width: "100vw",
-          background: "#181818",
+          background: "#222",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
