@@ -2,7 +2,6 @@ import { Button } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../../services/authContext/Auth.context";
