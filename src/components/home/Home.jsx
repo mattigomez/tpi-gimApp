@@ -35,7 +35,7 @@ const Home = ({ handleLogout }) => {
     }
   }, [token]);
 
-  // Obtener el rol del usuario desde el token
+
   let userRole = null;
   if (token) {
     const user = jwtDecode(token);
@@ -62,15 +62,16 @@ const Home = ({ handleLogout }) => {
             justifyContent: "center",
           }}
         >
-          <h2
-            style={{
-              color: "#fff",
-              marginBottom: "32px",
-              letterSpacing: "2px",
-            }}
-          >
-            TABLERO
-          </h2>
+        <h3
+              className="mb-4"
+              style={{
+                fontFamily: "Orbitron, Arial, sans-serif",
+                fontWeight: 700,
+                color: "#fff",
+              }}
+            >
+              {saludo}
+            </h3>
           <div
             style={{
               display: "flex",
