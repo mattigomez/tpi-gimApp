@@ -135,7 +135,7 @@ const RoutineItem = ({
               boxShadow: '0 0 24px rgba(0,0,0,0.5)'
             }}>
               <div style={{ marginBottom: 18, color: '#fff', fontSize: 16 }}>
-                ¿Estás seguro que desea eliminar la rutina <span style={{color:'#39e639', fontWeight:600}}>{title}</span>?
+                ¿Estás seguro que desea eliminar la rutina <span style={{color:'#39e639', fontWeight:600}}>{title}</span>? Los usuarios vinculados a esta rutina perderán su asignación.
               </div>
               <div className="d-flex justify-content-center gap-3">
                 <Button

@@ -432,7 +432,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
             textAlign: 'center',
             boxShadow: '0 0 24px rgba(0,0,0,0.3)'
           }}>
-            <h5 style={{marginBottom: 24}}>¿Desea eliminar el ejercicio "{exerciseToDelete?.name}"?</h5>
+            <h5 style={{marginBottom: 24, color: 'black'}}>¿Desea eliminar el ejercicio "{exerciseToDelete?.name}"?</h5>
             {deleteError && <div style={{ color: 'red', marginBottom: 12 }}>{deleteError}</div>}
             <div className="d-flex justify-content-center gap-3">
               <Button
