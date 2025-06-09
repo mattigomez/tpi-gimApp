@@ -9,6 +9,7 @@ import Home from "./components/home/Home";
 import Account from "./components/account/Account";
 import Partners from "./components/partners/Partners";
 
+
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
