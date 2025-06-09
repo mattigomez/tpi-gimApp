@@ -39,7 +39,6 @@ const Dashboard = ({ onLogout }) => {
       }}
     >
       <Header onLogout={onLogout} />
-      <h2>Rutinas</h2>
       <Routes>
         <Route index element={<Routines routines={routines} />} />
         <Route

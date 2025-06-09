@@ -1,16 +1,16 @@
 import { useState, useEffect, useContext } from "react";
 import RoutineItem from "../routineItem/RoutineItem";
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../../services/authContext/Auth.context";
 import { jwtDecode } from "../../services/jwtDecode";
 import { authFetch } from "../../services/authFetch";
 
 const Routines = ({ routines }) => {
-  const [selectedRoutine, setSelectedRoutine] = useState("");
   const [assignedRoutine, setAssignedRoutine] = useState(null);
   const [storageFlag, setStorageFlag] = useState(0);
   const [userInfo, setUserInfo] = useState(null);
+  const [search, setSearch] = useState("");
 
   // Recibe la función para refrescar rutinas desde el padre si existe
   const refreshRoutines = typeof window.refreshRoutines === 'function' ? window.refreshRoutines : undefined;
@@ -28,7 +28,7 @@ const Routines = ({ routines }) => {
     return () => window.removeEventListener("storage", handler);
   }, []);
 
-  // Fetch usuario actualizado cada vez que cambia storageFlag o routines
+  // Fetch usuario actualizado cada vez que cambia el storageFlag o routines
   useEffect(() => {
     if (!token) return;
     const user = jwtDecode(token);
@@ -51,14 +51,19 @@ const Routines = ({ routines }) => {
     setAssignedRoutine(found || null);
   }, [userInfo, routines]);
 
-  const handleRoutineSelected = (routineTitle) => {
-    setSelectedRoutine(routineTitle);
-  };
   const handleNavigateAddRoutine = () => {
     navigate("/dashboard/add-routine", { replace: true });
   };
 
-  const routinesMapped = routines.map((routine) => (
+  // Mostrar botón solo si el usuario es trainer o admin
+  const showAddButton = userInfo && (userInfo.role === "trainer" || userInfo.role === "admin");
+
+  // Rutinas filtradas por búsqueda
+  const filteredRoutines = routines.filter(routine =>
+    routine.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const routinesMapped = filteredRoutines.map((routine) => (
     <RoutineItem
       key={routine.id}
       title={routine.title}
@@ -66,45 +71,54 @@ const Routines = ({ routines }) => {
       level={routine.level}
       exercises={routine.exercises}
       id={routine.id}
-      onRoutineSelected={handleRoutineSelected}
       refreshRoutines={refreshRoutines}
     />
   ));
 
   return (
     <>
-      {selectedRoutine && (
-        <p>
-          Usted ha seleccionado la rutina: <b>{selectedRoutine}</b>
-        </p>
+      {showAddButton && (
+        <Button
+          variant="success"
+          className="me-2 mb-2"
+          onClick={handleNavigateAddRoutine}
+        >
+          Agregar Rutina
+        </Button>
       )}
-      <Button
-        variant="success"
-        className="me-2 mb-2"
-        onClick={handleNavigateAddRoutine}
-      >
-        Agregar Rutina
-      </Button>
 
-      {/* Rutina asignada */}
-      <div className="my-4 w-100 d-flex flex-column align-items-center">
-        <h4>Rutina asignada</h4>
-        {assignedRoutine ? (
-          <RoutineItem
-            key={assignedRoutine.id}
-            title={assignedRoutine.title}
-            description={assignedRoutine.description}
-            level={assignedRoutine.level}
-            exercises={assignedRoutine.exercises}
-            id={assignedRoutine.id}
-            onRoutineSelected={() => {}}
-            refreshRoutines={refreshRoutines}
+      {/* Rutina asignada solo para rol user */}
+      {userInfo && userInfo.role === "user" && (
+        <div className="my-4 w-100 d-flex flex-column align-items-center">
+          <h2>Rutina asignada</h2>
+          {assignedRoutine ? (
+            <RoutineItem
+              key={assignedRoutine.id}
+              title={assignedRoutine.title}
+              description={assignedRoutine.description}
+              level={assignedRoutine.level}
+              exercises={assignedRoutine.exercises}
+              id={assignedRoutine.id}
+              onRoutineSelected={() => {}}
+              refreshRoutines={refreshRoutines}
+            />
+          ) : (
+            <p className="text-muted">No tiene rutina asignada actualmente.</p>
+          )}
+        </div>
+      )}
+      {/* Título y buscador de rutinas */}
+      <div className="w-100 d-flex flex-column align-items-center">
+        <h2>Rutinas</h2>
+        <Form className="mb-3 w-100" style={{maxWidth: 400, margin: '0 auto'}}>
+          <Form.Control
+            type="text"
+            placeholder="Buscar rutina por nombre..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
           />
-        ) : (
-          <p className="text-muted">No tiene rutina asignada actualmente.</p>
-        )}
+        </Form>
       </div>
-
       <div className="d-flex justify-content-center flex-wrap">
         {routinesMapped}
       </div>
