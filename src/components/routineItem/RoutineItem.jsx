@@ -69,8 +69,11 @@ const RoutineItem = ({
                 </div>
             )}
             <Card.Body>
-                <Badge bg="primary" className="mb-2">{level}</Badge>
                 <Card.Title>{title}</Card.Title>
+                <div>
+                    <span>Nivel: </span>
+                    <Badge bg="primary" className="mb-2">{level}</Badge>
+                </div>
                 <Card.Text>{description}</Card.Text>
 
                 <ListGroup className="mb-3" variant="flush">
@@ -109,37 +112,46 @@ const RoutineItem = ({
             </div>
         )}
         {showDeleteModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999
+          }}>
             <div style={{
-                background: '#fff',
-                borderRadius: 8,
-                padding: 32,
-                minWidth: 320,
-                textAlign: 'center',
-                boxShadow: '0 0 24px rgba(0,0,0,0.3)',
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 9999
+              background: '#222',
+              color: '#fff',
+              borderRadius: 12,
+              padding: 24,
+              minWidth: 320,
+              maxWidth: 380,
+              width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 0 24px rgba(0,0,0,0.5)'
             }}>
-                <div>
-                    <h5 style={{ marginBottom: 24 }}>¿Estás seguro que desea eliminar la rutina?</h5>
-                    <div className="d-flex justify-content-center gap-3">
-                        <Button
-                            variant="danger"
-                            onClick={handleDelete}
-                        >Eliminar</Button>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setShowDeleteModal(false)}
-                        >Cancelar</Button>
-                    </div>
-                </div>
+              <div style={{ marginBottom: 18, color: '#fff', fontSize: 16 }}>
+                ¿Estás seguro que desea eliminar la rutina <span style={{color:'#39e639', fontWeight:600}}>{title}</span>?
+              </div>
+              <div className="d-flex justify-content-center gap-3">
+                <Button
+                  variant="danger"
+                  style={{ minWidth: 100, fontWeight: 600 }}
+                  onClick={handleDelete}
+                >Eliminar</Button>
+                <Button
+                  variant="outline-light"
+                  style={{ minWidth: 100, fontWeight: 600, borderColor: '#39e639', color: '#39e639' }}
+                  onClick={() => setShowDeleteModal(false)}
+                >Cancelar</Button>
+              </div>
             </div>
+          </div>
         )}
         </>
     );
