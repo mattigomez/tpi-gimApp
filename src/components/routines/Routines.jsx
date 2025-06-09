@@ -13,7 +13,10 @@ const Routines = ({ routines }) => {
   const [search, setSearch] = useState("");
 
   // Recibe la función para refrescar rutinas desde el padre si existe
-  const refreshRoutines = typeof window.refreshRoutines === 'function' ? window.refreshRoutines : undefined;
+  const refreshRoutines =
+    typeof window.refreshRoutines === "function"
+      ? window.refreshRoutines
+      : undefined;
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -34,8 +37,8 @@ const Routines = ({ routines }) => {
     const user = jwtDecode(token);
     if (!user?.id) return;
     authFetch(`http://localhost:3000/partners/${user.id}`)
-      .then(res => res.json())
-      .then(data => setUserInfo(data))
+      .then((res) => res.json())
+      .then((data) => setUserInfo(data))
       .catch(() => setUserInfo(null));
   }, [token, routines, storageFlag]);
 
@@ -46,7 +49,9 @@ const Routines = ({ routines }) => {
       return;
     }
     const found = routines.find(
-      r => r.id === userInfo.activeRoutineId || r.id === Number(userInfo.activeRoutineId)
+      (r) =>
+        r.id === userInfo.activeRoutineId ||
+        r.id === Number(userInfo.activeRoutineId)
     );
     setAssignedRoutine(found || null);
   }, [userInfo, routines]);
@@ -56,10 +61,11 @@ const Routines = ({ routines }) => {
   };
 
   // Mostrar botón solo si el usuario es trainer o admin
-  const showAddButton = userInfo && (userInfo.role === "trainer" || userInfo.role === "admin");
+  const showAddButton =
+    userInfo && (userInfo.role === "trainer" || userInfo.role === "admin");
 
   // Rutinas filtradas por búsqueda
-  const filteredRoutines = routines.filter(routine =>
+  const filteredRoutines = routines.filter((routine) =>
     routine.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -110,12 +116,25 @@ const Routines = ({ routines }) => {
       {/* Título y buscador de rutinas */}
       <div className="w-100 d-flex flex-column align-items-center">
         <h2>Rutinas</h2>
-        <Form className="mb-3 w-100" style={{maxWidth: 400, margin: '0 auto'}}>
+        <Form
+          className="mb-3 w-100 "
+          style={{
+            maxWidth: 400,
+            margin: "0 auto",
+
+          }}
+        >
           <Form.Control
+            className="routines-search-input"
             type="text"
             placeholder="Buscar rutina por nombre..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              color: "var(--my-text)",
+              backgroundColor: "var(--my-bg)", 
+              borderColor: "var(--my-primary)",
+            }}
           />
         </Form>
       </div>

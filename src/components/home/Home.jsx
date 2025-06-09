@@ -43,72 +43,94 @@ const Home = ({ handleLogout }) => {
   }
 
   return (
-    <div
-      style={{
-        marginTop: "150px",
-        padding: "100px",
-        background: "#222",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <>
       <Header onLogout={handleLogout} />
-        <h3
-              className="mb-4"
-              style={{
-                fontFamily: "Orbitron, Arial, sans-serif",
-                fontWeight: 700,
-                color: "#fff",
-              }}
-            >
-              {saludo}
-            </h3>
-      <div style={{ display: "flex", gap: "32px" }}>
-        <Card
+      <div
+        style={{
+          height:"100vh",
+          background: "var(--my-bg)",
+        }}
+      >
+        <div
           style={{
-            width: "12rem",
-            cursor: "pointer",
+            marginTop: "150px",
+            padding: "100px",
+            background: "#222",
+            display: "flex",
+            flexDirection: "column",
             alignItems: "center",
+            justifyContent: "center",
           }}
-          onClick={() => navigate("/account")}
         >
-          <Card.Body className="d-flex flex-column align-items-center">
-            <span style={{ fontSize: "48px", marginBottom: "12px" }}>👤</span>
-            <Card.Title>Cuenta</Card.Title>
-          </Card.Body>
-        </Card>
-        {(userRole === "admin" || userRole === "trainer") && (
-          <Card
+          <h2
             style={{
-              width: "12rem",
-              cursor: "pointer",
-              alignItems: "center",
+              color: "#fff",
+              marginBottom: "32px",
+              letterSpacing: "2px",
             }}
-            onClick={() => navigate("/partners")}
           >
-            <Card.Body className="d-flex flex-column align-items-center">
-              <span style={{ fontSize: "48px", marginBottom: "12px" }}>📈</span>
-              <Card.Title>Socios</Card.Title>
-            </Card.Body>
-          </Card>
-        )}
-        <Card
-          style={{
-            width: "12rem",
-            cursor: "pointer",
-            alignItems: "center",
-          }}
-          onClick={() => navigate("/dashboard")}
-        >
-          <Card.Body className="d-flex flex-column align-items-center">
-            <span style={{ fontSize: "48px", marginBottom: "12px" }}>🏋️‍♂️</span>
-            <Card.Title>Rutinas</Card.Title>
-          </Card.Body>
-        </Card>
+            TABLERO
+          </h2>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap:"32px"
+            }}
+          >
+            <Card
+              style={{
+                width: "12rem",
+                cursor: "pointer",
+                alignItems: "center",
+                display: "flex",
+                gap: "32px",
+              }}
+              onClick={() => navigate("/account")}
+            >
+              <Card.Body className="d-flex flex-column align-items-center">
+                <span style={{ fontSize: "48px", marginBottom: "12px" }}>
+                  👤
+                </span>
+                <Card.Title>Cuenta</Card.Title>
+              </Card.Body>
+            </Card>
+            {(userRole === "admin" || userRole === "trainer") && (
+              <Card
+                style={{
+                  width: "12rem",
+                  cursor: "pointer",
+                  alignItems: "center",
+                }}
+                onClick={() => navigate("/partners")}
+              >
+                <Card.Body className="d-flex flex-column align-items-center">
+                  <span style={{ fontSize: "48px", marginBottom: "12px" }}>
+                    📈
+                  </span>
+                  <Card.Title>Socios</Card.Title>
+                </Card.Body>
+              </Card>
+            )}
+            <Card
+              style={{
+                width: "12rem",
+                cursor: "pointer",
+                alignItems: "center",
+              }}
+              onClick={() => navigate("/dashboard")}
+            >
+              <Card.Body className="d-flex flex-column align-items-center">
+                <span style={{ fontSize: "48px", marginBottom: "12px" }}>
+                  🏋️‍♂️
+                </span>
+                <Card.Title>Rutinas</Card.Title>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

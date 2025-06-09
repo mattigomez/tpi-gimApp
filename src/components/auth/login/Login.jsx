@@ -90,6 +90,12 @@ const Login = ({ onLogin }) => {
     }
   };
   return (
+    <div
+    style={{
+      height:"100vh",
+      background:"var(--my-bg)"
+    }
+    }>
     <Card className="mt-5 mx-3 p-3 px-5 shadow">
       <Card.Body>
         <Row className="mb-2">
@@ -135,6 +141,7 @@ const Login = ({ onLogin }) => {
         </Form>
       </Card.Body>
     </Card>
+    </div>
   );
 };
 

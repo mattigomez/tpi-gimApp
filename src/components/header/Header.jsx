@@ -5,6 +5,7 @@ import Container from "react-bootstrap/Container";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../../services/authContext/Auth.context";
+import ToggleTheme from "../toggleTheme/ToggleTheme";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Header = () => {
 
   const handleLogout = () => {
     handleUserLogout();
-    navigate("/login")
+    navigate("/login");
   };
 
   return (
@@ -32,9 +33,8 @@ const Header = () => {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar-content" />
         <Navbar.Collapse id="navbar-content">
-          <Nav className="ms-auto">
-            {" "}
-            {}
+          <Nav className="ms-auto p-auto align-items-center">
+            <ToggleTheme />
             <Button
               variant="outline-light"
               className="me-2"

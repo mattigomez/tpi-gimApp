@@ -170,7 +170,7 @@ const Account = ({ handleLogout }) => {
         style={{
           minHeight: "100vh",
           width: "100%",
-          background: "#6d6d65",
+          background: "var(--my-bg)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

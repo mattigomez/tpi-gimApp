@@ -168,217 +168,245 @@ const Partners = ({ handleLogout }) => {
 
   // Filtrado de socios según el texto de búsqueda
   const filteredPartners = partners.filter((p) => {
-    const text = `${p.nombre} ${p.apellido} ${p.email} ${p.telefono}`.toLowerCase();
+    const text =
+      `${p.nombre} ${p.apellido} ${p.email} ${p.telefono}`.toLowerCase();
     return text.includes(search.toLowerCase());
   });
 
   return (
-    <div
-      className="d-flex flex-column align-items-center"
-      style={{ marginTop: "120px" }}
-    >
+    <>
       <Header onLogout={handleLogout} />
-      {/* Buscador centrado y de tamaño normal */}
-      <div className="d-flex justify-content-center mb-3" style={{ width: "100%" }}>
-        <Form.Control
-          type="text"
-          placeholder="Buscar socio por nombre, apellido, email o teléfono..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ maxWidth: 400 }}
-        />
-      </div>
-      <Card
-        className="m-auto bg-dark p-4"
-        style={{ maxWidth: "1500px", width: "100%" }}
+      <div
+        className="d-flex flex-column align-items-center"
+        style={{
+          minHeight: "100vh",
+          paddingTop: "90px",
+          background: "var(--my-bg)",
+        }}
       >
-        <Card.Body>
-          <div className="d-flex flex-column justify-content-center align-items-center mb-4">
-            <Card.Title className="mb-2 text-center" style={{fontSize: '1.6rem', fontWeight: 700}}>Lista de Socios</Card.Title>
-            {userRole === "admin" && (
-              <Button variant="success" onClick={() => setShowAddUserModal(true)}>
-                Agregar usuario
-              </Button>
-            )}
-          </div>
-          {loading ? (
-            <Spinner animation="border" />
-          ) : (
-            <Row className="justify-content-center">
-              {filteredPartners.map((p) => (
-                <Col
-                  key={p.id}
-                  md={
-                    filteredPartners.length === 1
-                      ? 12
-                      : filteredPartners.length === 2
-                      ? 6
-                      : 4
-                  }
-                  className="mb-4 d-flex justify-content-center"
-                  style={
-                    filteredPartners.length === 1 || filteredPartners.length === 2
-                      ? { maxWidth: 400 }
-                      : {}
-                  }
-                >
-                  <Card className="bg-dark text-white h-100 border rounded w-100">
-                    <Card.Body>
-                      <div>
-                        <div>
-                          <b>Nombre:</b> {p.nombre} {p.apellido}
-                        </div>
-                        <div>
-                          <b>Edad:</b> {p.edad} años
-                        </div>
-                        <div>
-                          <b>Estatura:</b> {p.estatura} cm
-                        </div>
-                        <div>
-                          <b>Peso:</b> {p.peso} kg
-                        </div>
-                        <div>
-                          <b>Teléfono:</b> {p.telefono}
-                        </div>
-                        <div>
-                          <b>Email:</b> {p.email}
-                        </div>
-                        {p.role !== "trainer" && (
-                          <div className="mt-2">
-                            <b>Rutina activa:</b>{" "}
-                            {activeRoutines[p.id] && activeRoutines[p.id]?.title ? (
-                              <span>
-                                {activeRoutines[p.id].title} (
-                                {activeRoutines[p.id].level})
-                              </span>
-                            ) : (
-                              <span className="text-warning">Sin rutina activa</span>
-                            )}
-                            {(userRole === "admin" || userRole === "trainer") && (
-                              <div className="mt-2">
-                                <select
-                                  value={activeRoutines[p.id]?.id || ""}
-                                  onChange={(e) =>
-                                    handleRoutineChange(p.id, e.target.value)
-                                  }
-                                >
-                                  <option value="">Seleccionar rutina</option>
-                                  {routines.map((r) => (
-                                    <option key={r.id} value={r.id}>
-                                      {r.title} ({r.level})
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </Card.Body>
-                    <Card.Footer className="bg-dark border-0">
-                      {(userRole === "admin") && (
-                        <Button
-                          variant="danger"
-                          onClick={() => handleShowModal(p.id)}
-                          className="w-100"
-                        >
-                          Eliminar
-                        </Button>
-                      )}
-                    </Card.Footer>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          )}
-          <Button
-            variant="outline-secondary"
-            onClick={handleGoBack}
-            className="mt-3 w-100"
-          >
-            Volver
-          </Button>
-        </Card.Body>
-      </Card>
-
-      {/* Modal de confirmación */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmar eliminación</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>¿Seguro que deseas eliminar este socio?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Eliminar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Modal para agregar usuario */}
-      <Modal
-        show={showAddUserModal}
-        onHide={() => setShowAddUserModal(false)}
-        centered
-      >
-        <Modal.Header closeButton className="bg-dark text-white">
-          <Modal.Title>Agregar nuevo usuario</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="bg-dark text-white">
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={newUser.email}
-                onChange={handleNewUserChange}
-                placeholder="Ingrese el email"
-                className="bg-dark text-white"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Contraseña</Form.Label>
-              <Form.Control
-                type="text"
-                name="password"
-                value={newUser.password}
-                onChange={handleNewUserChange}
-                placeholder="Ingrese la contraseña"
-                className="bg-dark text-white"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Rol</Form.Label>
-              <Form.Select
-                name="role"
-                value={newUser.role}
-                onChange={handleNewUserChange}
-                className="bg-dark text-white"
+        <div
+          className="d-flex justify-content-center m-3"
+          style={{ width: "100%" }}
+        >
+          <Form.Control
+            className="routines-search-input"
+            type="text"
+            placeholder="Buscar socio por nombre, apellido, email o teléfono..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              maxWidth: 400,
+              color: "var(--my-text)",
+              backgroundColor: "var(--my-bg)",
+              borderColor: "var(--my-primary)",
+            }}
+          />
+        </div>
+        <Card
+          className="m-auto bg-dark p-4"
+          style={{ maxWidth: "1500px", width: "100%" }}
+        >
+          <Card.Body>
+            <div className="d-flex flex-column justify-content-center align-items-center mb-4">
+              <Card.Title
+                className="mb-2 text-center"
+                style={{ fontSize: "1.6rem", fontWeight: 700 }}
               >
-                <option value="user">Cliente</option>
-                <option value="trainer">Profesor</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer className="bg-dark">
-          <Button
-            variant="secondary"
-            onClick={() => setShowAddUserModal(false)}
-          >
-            Cancelar
-          </Button>
-          <Button variant="success" onClick={handleAddUser}>
-            Confirmar
-          </Button>
-        </Modal.Footer>
-      </Modal>
+                Lista de Socios
+              </Card.Title>
+              {userRole === "admin" && (
+                <Button
+                  variant="success"
+                  onClick={() => setShowAddUserModal(true)}
+                >
+                  Agregar usuario
+                </Button>
+              )}
+            </div>
+            {loading ? (
+              <Spinner animation="border" />
+            ) : (
+              <Row className="justify-content-center">
+                {filteredPartners.map((p) => (
+                  <Col
+                    key={p.id}
+                    md={
+                      filteredPartners.length === 1
+                        ? 12
+                        : filteredPartners.length === 2
+                        ? 6
+                        : 4
+                    }
+                    className="mb-4 d-flex justify-content-center"
+                    style={
+                      filteredPartners.length === 1 ||
+                      filteredPartners.length === 2
+                        ? { maxWidth: 400 }
+                        : {}
+                    }
+                  >
+                    <Card className="bg-dark text-white h-100 border rounded w-100">
+                      <Card.Body>
+                        <div>
+                          <div>
+                            <b>Nombre:</b> {p.nombre} {p.apellido}
+                          </div>
+                          <div>
+                            <b>Edad:</b> {p.edad} años
+                          </div>
+                          <div>
+                            <b>Estatura:</b> {p.estatura} cm
+                          </div>
+                          <div>
+                            <b>Peso:</b> {p.peso} kg
+                          </div>
+                          <div>
+                            <b>Teléfono:</b> {p.telefono}
+                          </div>
+                          <div>
+                            <b>Email:</b> {p.email}
+                          </div>
+                          {p.role !== "trainer" && (
+                            <div className="mt-2">
+                              <b>Rutina activa:</b>{" "}
+                              {activeRoutines[p.id] &&
+                              activeRoutines[p.id]?.title ? (
+                                <span>
+                                  {activeRoutines[p.id].title} (
+                                  {activeRoutines[p.id].level})
+                                </span>
+                              ) : (
+                                <span className="text-warning">
+                                  Sin rutina activa
+                                </span>
+                              )}
+                              {(userRole === "admin" ||
+                                userRole === "trainer") && (
+                                <div className="mt-2">
+                                  <select
+                                    value={activeRoutines[p.id]?.id || ""}
+                                    onChange={(e) =>
+                                      handleRoutineChange(p.id, e.target.value)
+                                    }
+                                  >
+                                    <option value="">Seleccionar rutina</option>
+                                    {routines.map((r) => (
+                                      <option key={r.id} value={r.id}>
+                                        {r.title} ({r.level})
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </Card.Body>
+                      <Card.Footer className="bg-dark border-0">
+                        {userRole === "admin" && (
+                          <Button
+                            variant="danger"
+                            onClick={() => handleShowModal(p.id)}
+                            className="w-100"
+                          >
+                            Eliminar
+                          </Button>
+                        )}
+                      </Card.Footer>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
+            <Button
+              variant="outline-secondary"
+              onClick={handleGoBack}
+              className="mt-3 w-100"
+            >
+              Volver
+            </Button>
+          </Card.Body>
+        </Card>
 
-      <ToastContainer />
-    </div>
+        {/* Modal de confirmación */}
+        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirmar eliminación</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>¿Seguro que deseas eliminar este socio?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Cancelar
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete}>
+              Eliminar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Modal para agregar usuario */}
+        <Modal
+          show={showAddUserModal}
+          onHide={() => setShowAddUserModal(false)}
+          centered
+        >
+          <Modal.Header closeButton className="bg-dark text-white">
+            <Modal.Title>Agregar nuevo usuario</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="bg-dark text-white">
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={newUser.email}
+                  onChange={handleNewUserChange}
+                  placeholder="Ingrese el email"
+                  className="bg-dark text-white"
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Contraseña</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="password"
+                  value={newUser.password}
+                  onChange={handleNewUserChange}
+                  placeholder="Ingrese la contraseña"
+                  className="bg-dark text-white"
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Rol</Form.Label>
+                <Form.Select
+                  name="role"
+                  value={newUser.role}
+                  onChange={handleNewUserChange}
+                  className="bg-dark text-white"
+                >
+                  <option value="user">Cliente</option>
+                  <option value="trainer">Profesor</option>
+                </Form.Select>
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer className="bg-dark">
+            <Button
+              variant="secondary"
+              onClick={() => setShowAddUserModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button variant="success" onClick={handleAddUser}>
+              Confirmar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <ToastContainer />
+      </div>
+    </>
   );
 };
 
