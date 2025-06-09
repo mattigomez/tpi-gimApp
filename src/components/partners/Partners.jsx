@@ -254,11 +254,11 @@ const Partners = ({ handleLogout }) => {
                           <div>
                             <b>Email:</b> {p.email}
                           </div>
-                          {/* Mostrar rutina activa y selección solo si NO sos admin */}
-                          {userRole !== "admin" && p.role !== "trainer" && (
+                          {p.role !== "admin" && p.role !== "trainer" && (
                             <div className="mt-2">
                               <b>Rutina activa:</b>{" "}
-                              {activeRoutines[p.id] && activeRoutines[p.id]?.title ? (
+                              {activeRoutines[p.id] &&
+                              activeRoutines[p.id]?.title ? (
                                 <span>
                                   {activeRoutines[p.id].title} (
                                   {activeRoutines[p.id].level})
@@ -268,7 +268,8 @@ const Partners = ({ handleLogout }) => {
                                   Sin rutina activa
                                 </span>
                               )}
-                              {(userRole === "trainer") && (
+                              {(userRole === "admin" ||
+                                userRole === "trainer") && (
                                 <div className="mt-2">
                                   <select
                                     value={activeRoutines[p.id]?.id || ""}
