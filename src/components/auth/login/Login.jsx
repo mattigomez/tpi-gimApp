@@ -61,17 +61,13 @@ const Login = ({ onLogin }) => {
       }));
       return;
     }
-
-    // Lógica de login real
     try {
-      console.log("Login request:", { email, password });
       const res = await fetch("http://localhost:3000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      console.log("Login response:", data);
       const token = data.token || (typeof data === "string" ? data : null);
       if (res.ok && token) {
         handleUserLogin(token);

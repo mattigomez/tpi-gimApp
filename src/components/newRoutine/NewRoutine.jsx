@@ -24,14 +24,12 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const [duplicateTitleError, setDuplicateTitleError] = useState("");
   const navigate = useNavigate();
 
-  // Traer ejercicios existentes al montar
   useEffect(() => {
     authFetch("http://localhost:3000/exercises")
       .then(res => res.json())
       .then(data => setAvailableExercises(data));
   }, []);
 
-  // Rellenar datos si es modo edición
   useEffect(() => {
     if (isEditMode && initialData) {
       setTitle(initialData.title || "");
@@ -41,7 +39,6 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     }
   }, [initialData, isEditMode]);
 
-  // Agregar ejercicio nuevo
   const handleAddExercise = () => {
     if (exerciseName && sets && (repetitions || repetitions === 0)) {
       setExercises([
@@ -58,7 +55,6 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     }
   };
 
-  // Agregar ejercicio existente
   const handleAddExistingExercise = () => {
     if (
       selectedExerciseId &&
@@ -73,17 +69,14 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     }
   };
 
-  // Eliminar ejercicio de la lista
   const handleRemoveExercise = (index) => {
     setExercises(exercises.filter((_, i) => i !== index));
   };
 
-  // Enviar rutina a la API
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormTriedSubmit(true);
     setDuplicateTitleError("");
-    // Validar nombre único
     try {
       const resRoutines = await authFetch("http://localhost:3000/routines");
       const routinesList = await resRoutines.json();
@@ -111,7 +104,6 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     if (!Array.isArray(exercises) || exercises.length === 0) {
       return;
     }
-    // Validar ejercicios
     for (const ex of exercises) {
       if (!ex.name || !ex.sets || !ex.repetitions) {
         toast.error("Todos los ejercicios deben tener nombre, series y repeticiones");

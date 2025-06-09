@@ -14,7 +14,6 @@ const Home = ({ handleLogout }) => {
   useEffect(() => {
     if (token) {
       const user = jwtDecode(token);
-      // Traer nombre desde la API si existe
       fetch(`http://localhost:3000/partners/${user?.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })

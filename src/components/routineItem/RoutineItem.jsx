@@ -19,7 +19,6 @@ const RoutineItem = ({
     const [editData, setEditData] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    // Obtener el rol del usuario desde el token
     const { token } = useContext(AuthContext);
     let userRole = null;
     if (token) {
