@@ -13,7 +13,7 @@ const Account = ({ handleLogout }) => {
   let emailFromToken = "";
   if (token) {
     const user = jwtDecode(token);
-    userId = user?.id || ""; // <-- el id debe venir en el token
+    userId = user?.id || "";
     emailFromToken = user?.email || "";
   }
 
@@ -32,8 +32,6 @@ const Account = ({ handleLogout }) => {
     newPassword: "",
     confirmNewPassword: "",
   });
-
-  // Traer datos del usuario al montar
   useEffect(() => {
     if (userId) {
       authFetch(`http://localhost:3000/partners/${userId}`)
@@ -56,7 +54,6 @@ const Account = ({ handleLogout }) => {
     }
   }, [userId, emailFromToken]);
 
-  // Manejar cambios en datos personales
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -65,7 +62,6 @@ const Account = ({ handleLogout }) => {
     }));
   };
 
-  // Manejar cambios en contraseña
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordData((prev) => ({
@@ -74,7 +70,6 @@ const Account = ({ handleLogout }) => {
     }));
   };
 
-  // Validación de campos (solo verifica valores si hay contenido)
   const validateForm = () => {
     const errors = [];
     if (formData.edad && (isNaN(formData.edad) || Number(formData.edad) <= 0 || Number(formData.edad) > 120))
@@ -88,7 +83,6 @@ const Account = ({ handleLogout }) => {
     return errors;
   };
 
-  // Guardar datos personales
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
@@ -116,7 +110,6 @@ const Account = ({ handleLogout }) => {
     }
   };
 
-  // Cambiar contraseña (si tenés endpoint /partners/:id/password)
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (

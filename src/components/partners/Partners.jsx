@@ -22,10 +22,9 @@ const Partners = ({ handleLogout }) => {
     password: "",
     role: "user",
   });
-  const [search, setSearch] = useState(""); // Nuevo estado para el buscador
+  const [search, setSearch] = useState(""); 
   const navigate = useNavigate();
 
-  // Obtener el rol del usuario desde el token
   const { token } = useContext(AuthContext);
   let userRole = null;
   if (token) {
@@ -33,7 +32,6 @@ const Partners = ({ handleLogout }) => {
     userRole = user?.role;
   }
 
-  // Traer socios y rutinas
   useEffect(() => {
     authFetch("http://localhost:3000/partners")
       .then((res) => res.json())
@@ -47,14 +45,12 @@ const Partners = ({ handleLogout }) => {
         setLoading(false);
       });
 
-    // Traer todas las rutinas
     authFetch("http://localhost:3000/routines")
       .then((res) => res.json())
       .then((data) => setRoutines(data))
       .catch((err) => console.error(err));
   }, []);
 
-  // Traer rutina activa de un socio
   const fetchActiveRoutine = (id) => {
     authFetch(`http://localhost:3000/partners/${id}/active-routine`)
       .then((res) => res.json())
@@ -64,7 +60,6 @@ const Partners = ({ handleLogout }) => {
       .catch((err) => console.error(err));
   };
 
-  // Cambiar rutina activa
   const handleRoutineChange = (partnerId, routineId) => {
     authFetch(`http://localhost:3000/partners/${partnerId}/active-routine`, {
       method: "PUT",
@@ -75,25 +70,21 @@ const Partners = ({ handleLogout }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        // Si el backend devuelve un nuevo token, guárdalo
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
         fetchActiveRoutine(partnerId);
         toast.success("Rutina activa actualizada");
-        // Notificar a otras vistas que la rutina fue cambiada
         localStorage.setItem("routine-assigned-updated", Date.now());
       })
       .catch(() => toast.error("Error al actualizar rutina"));
   };
 
-  // Mostrar modal de confirmación
   const handleShowModal = (id) => {
     setSelectedId(id);
     setShowModal(true);
   };
 
-  // Confirmar eliminación
   const handleConfirmDelete = () => {
     authFetch(`http://localhost:3000/partners/${selectedId}`, {
       method: "DELETE",
@@ -113,7 +104,6 @@ const Partners = ({ handleLogout }) => {
       });
   };
 
-  // Modal para agregar usuario
   const handleNewUserChange = (e) => {
     const { name, value } = e.target;
     setNewUser((prev) => ({ ...prev, [name]: value }));
@@ -149,7 +139,6 @@ const Partners = ({ handleLogout }) => {
         toast.success("Usuario creado correctamente");
         setShowAddUserModal(false);
         setNewUser({ email: "", password: "", role: "user" });
-        // Refrescar lista de socios
         authFetch("http://localhost:3000/partners")
           .then((res) => res.json())
           .then((data) => setPartners(data));
@@ -166,7 +155,6 @@ const Partners = ({ handleLogout }) => {
     navigate("/home", { replace: true });
   };
 
-  // Filtrado de socios según el texto de búsqueda
   const filteredPartners = partners.filter((p) => {
     const text =
       `${p.nombre} ${p.apellido} ${p.email} ${p.telefono}`.toLowerCase();

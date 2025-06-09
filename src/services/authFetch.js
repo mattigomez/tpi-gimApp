@@ -1,5 +1,3 @@
-// src/services/authFetch.js
-// Helper para hacer fetch autenticado automáticamente con el token
 
 export const authFetch = (url, options = {}) => {
   const token = localStorage.getItem("GymHub-2025");

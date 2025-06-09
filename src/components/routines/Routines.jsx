@@ -12,7 +12,6 @@ const Routines = ({ routines }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [search, setSearch] = useState("");
 
-  // Recibe la función para refrescar rutinas desde el padre si existe
   const refreshRoutines =
     typeof window.refreshRoutines === "function"
       ? window.refreshRoutines
@@ -20,7 +19,6 @@ const Routines = ({ routines }) => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Escucha cambios en localStorage para rutina asignada
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "routine-assigned-updated") {
@@ -31,7 +29,6 @@ const Routines = ({ routines }) => {
     return () => window.removeEventListener("storage", handler);
   }, []);
 
-  // Fetch usuario actualizado cada vez que cambia el storageFlag o routines
   useEffect(() => {
     if (!token) return;
     const user = jwtDecode(token);
@@ -42,7 +39,7 @@ const Routines = ({ routines }) => {
       .catch(() => setUserInfo(null));
   }, [token, routines, storageFlag]);
 
-  // Actualiza la rutina asignada cuando cambia el usuario o las rutinas
+
   useEffect(() => {
     if (!userInfo?.activeRoutineId) {
       setAssignedRoutine(null);
@@ -60,11 +57,9 @@ const Routines = ({ routines }) => {
     navigate("/dashboard/add-routine", { replace: true });
   };
 
-  // Mostrar botón solo si el usuario es trainer o admin
   const showAddButton =
     userInfo && (userInfo.role === "trainer" || userInfo.role === "admin");
 
-  // Rutinas filtradas por búsqueda
   const filteredRoutines = routines.filter((routine) =>
     routine.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -93,7 +88,6 @@ const Routines = ({ routines }) => {
         </Button>
       )}
 
-      {/* Rutina asignada solo para rol user */}
       {userInfo && userInfo.role === "user" && (
         <div className="my-4 w-100 d-flex flex-column align-items-center">
           <h2>Rutina asignada</h2>
@@ -113,7 +107,6 @@ const Routines = ({ routines }) => {
           )}
         </div>
       )}
-      {/* Título y buscador de rutinas */}
       <div className="w-100 d-flex flex-column align-items-center">
         <h2>Rutinas</h2>
         <Form
