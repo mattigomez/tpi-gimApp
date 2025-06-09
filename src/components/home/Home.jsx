@@ -19,7 +19,7 @@ const Home = ({ handleLogout }) => {
   return (
     <div
       style={{
-        marginTop: "260px",
+        marginTop: "150px",
         padding: "100px",
         background: "#222",
         display: "flex",

@@ -150,8 +150,8 @@ const Account = ({ handleLogout }) => {
       <div
         style={{
           minHeight: "100vh",
-          width: "100vw",
-          background: "#222",
+          width: "100%",
+          background: "#6d6d65",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -161,7 +161,7 @@ const Account = ({ handleLogout }) => {
       >
         <Card
           style={{ maxWidth: "600px", width: "100%", margin: "0 auto" }}
-          className="p-4 shadow"
+          className="bg-dark p-4"
         >
           <Card.Body>
             <h3
