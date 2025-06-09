@@ -16,10 +16,8 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    handleUserLogout(); // Borra el token
-    toast.success("Cierre de sesiòn exitoso", {
-      onClose: () => navigate("/login")
-    });
+    handleUserLogout();
+    navigate("/login")
   };
 
   return (
