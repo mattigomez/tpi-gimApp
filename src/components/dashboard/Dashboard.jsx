@@ -10,14 +10,14 @@ const Dashboard = ({ handleLogout }) => {
 
   useEffect(() => {
     authFetch("http://localhost:3000/routines")
-      .then(res => res.json())
-      .then(data => setRoutines(data));
+      .then((res) => res.json())
+      .then((data) => setRoutines(data));
   }, []);
 
   const refreshRoutines = () => {
     authFetch("http://localhost:3000/routines")
-      .then(res => res.json())
-      .then(data => setRoutines(data));
+      .then((res) => res.json())
+      .then((data) => setRoutines(data));
   };
 
   useEffect(() => {
@@ -31,7 +31,8 @@ const Dashboard = ({ handleLogout }) => {
     <div
       style={{
         minHeight: "100vh",
-        background: "#6d6d65",
+        background: "var(--my-bg)",
+        color: "var(--my-text)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

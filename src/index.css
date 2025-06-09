@@ -11,3 +11,24 @@ html {
 body {
   margin: 0;
 }
+
+html, body {
+  background: var(--my-bg) !important;
+  color: var(--my-text) !important;
+}
+
+html[data-bs-theme='light'] {
+  --my-bg: #f8f9fa;
+  --my-text: #212529;
+  --my-primary:#212529;
+}
+html[data-bs-theme='dark'] {
+  --my-bg: #6d6d65;
+  --my-text: #f8f9fa;
+  --my-primary: #212529;
+}
+
+html[data-bs-theme='light'] .routines-search-input::placeholder {
+  color: var(--my-text)  !important; 
+  opacity: 1;
+}
