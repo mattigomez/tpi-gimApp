@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../../services/authContext/Auth.context";
 
-const Header = ({ onLogout }) => {
+const Header = () => {
   const navigate = useNavigate();
   const { handleUserLogout } = useContext(AuthContext);
 
@@ -17,7 +17,6 @@ const Header = ({ onLogout }) => {
 
   const handleLogout = () => {
     handleUserLogout(); // Borra el token
-    onLogout();
     toast.success("Cierre de sesiòn exitoso", {
       onClose: () => navigate("/login")
     });
