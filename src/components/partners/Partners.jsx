@@ -193,15 +193,14 @@ const Partners = ({ handleLogout }) => {
         style={{ maxWidth: "1500px", width: "100%" }}
       >
         <Card.Body>
-          <div className="d-flex justify-content-end mb-3">
+          <div className="d-flex flex-column justify-content-center align-items-center mb-4">
+            <Card.Title className="mb-2 text-center" style={{fontSize: '1.6rem', fontWeight: 700}}>Lista de Socios</Card.Title>
             {userRole === "admin" && (
               <Button variant="success" onClick={() => setShowAddUserModal(true)}>
                 Agregar usuario
               </Button>
             )}
           </div>
-          {/* Título centrado */}
-          <Card.Title className="mb-4 text-center">Lista de Socios</Card.Title>
           {loading ? (
             <Spinner animation="border" />
           ) : (

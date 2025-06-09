@@ -79,7 +79,11 @@ const Login = ({ onLogin }) => {
         toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
         navigate("/home");
       } else {
-        toast.error(data.message || "Credenciales incorrectas");
+        if (data.message && data.message.toLowerCase().includes("contraseña")) {
+          toast.error("Usuario y/o contraseña es incorrecta");
+        } else {
+          toast.error(data.message || "Credenciales incorrectas");
+        }
       }
     } catch {
       toast.error("Error de conexión");
