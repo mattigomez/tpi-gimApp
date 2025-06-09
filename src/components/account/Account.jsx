@@ -74,9 +74,28 @@ const Account = ({ handleLogout }) => {
     }));
   };
 
+  // Validación de campos (solo verifica valores si hay contenido)
+  const validateForm = () => {
+    const errors = [];
+    if (formData.edad && (isNaN(formData.edad) || Number(formData.edad) <= 0 || Number(formData.edad) > 120))
+      errors.push("La edad debe ser un número entre 1 y 120.");
+    if (formData.estatura && (isNaN(formData.estatura) || Number(formData.estatura) < 50 || Number(formData.estatura) > 300))
+      errors.push("La estatura debe ser un número entre 50 y 300 cm.");
+    if (formData.peso && (isNaN(formData.peso) || Number(formData.peso) < 20 || Number(formData.peso) > 400))
+      errors.push("El peso debe ser un número entre 20 y 400 kg.");
+    if (formData.telefono && !/^\d{6,15}$/.test(formData.telefono))
+      errors.push("El teléfono debe contener solo números (6 a 15 dígitos).");
+    return errors;
+  };
+
   // Guardar datos personales
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const errors = validateForm();
+    if (errors.length > 0) {
+      errors.forEach(msg => toast.error(msg));
+      return;
+    }
     try {
       const res = await authFetch(
         `http://localhost:3000/partners/${userId}`,
@@ -178,7 +197,7 @@ const Account = ({ handleLogout }) => {
               <div className="row">
                 <div className="col-md-6">
                   <Form.Group className="mb-3">
-                    <Form.Label>Nombre</Form.Label>
+                    <Form.Label>Nombre completo</Form.Label>
                     <Form.Control
                       type="text"
                       name="nombre"
@@ -209,16 +228,6 @@ const Account = ({ handleLogout }) => {
                   </Form.Group>
                 </div>
                 <div className="col-md-6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>Apellido</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="apellido"
-                      value={formData.apellido}
-                      onChange={handleChange}
-                      placeholder="Ingrese su apellido"
-                    />
-                  </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>Estatura (cm)</Form.Label>
                     <Form.Control

@@ -1,15 +1,41 @@
 import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import Header from "../header/Header";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../services/authContext/Auth.context";
 import { jwtDecode } from "../../services/jwtDecode";
 
 const Home = ({ handleLogout }) => {
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+
+  const [saludo, setSaludo] = useState("Bienvenido");
+
+  useEffect(() => {
+    if (token) {
+      const user = jwtDecode(token);
+      // Traer nombre desde la API si existe
+      fetch(`http://localhost:3000/partners/${user?.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && data.nombre) {
+            setSaludo(`Bienvenido ${data.nombre}`);
+          } else if (user?.email) {
+            setSaludo(`Bienvenido ${user.email}`);
+          } else {
+            setSaludo("Bienvenido");
+          }
+        })
+        .catch(() => {
+          if (user?.email) setSaludo(`Bienvenido ${user.email}`);
+          else setSaludo("Bienvenido");
+        });
+    }
+  }, [token]);
 
   // Obtener el rol del usuario desde el token
-  const { token } = useContext(AuthContext);
   let userRole = null;
   if (token) {
     const user = jwtDecode(token);
@@ -29,10 +55,23 @@ const Home = ({ handleLogout }) => {
       }}
     >
       <Header onLogout={handleLogout} />
-      <h2 style={{ color: "#fff", marginBottom: "32px", letterSpacing: "2px" }}>TABLERO</h2>
+        <h3
+              className="mb-4"
+              style={{
+                fontFamily: "Orbitron, Arial, sans-serif",
+                fontWeight: 700,
+                color: "#fff",
+              }}
+            >
+              {saludo}
+            </h3>
       <div style={{ display: "flex", gap: "32px" }}>
         <Card
-          style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
+          style={{
+            width: "12rem",
+            cursor: "pointer",
+            alignItems: "center",
+          }}
           onClick={() => navigate("/account")}
         >
           <Card.Body className="d-flex flex-column align-items-center">
@@ -42,7 +81,11 @@ const Home = ({ handleLogout }) => {
         </Card>
         {(userRole === "admin" || userRole === "trainer") && (
           <Card
-            style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
+            style={{
+              width: "12rem",
+              cursor: "pointer",
+              alignItems: "center",
+            }}
             onClick={() => navigate("/partners")}
           >
             <Card.Body className="d-flex flex-column align-items-center">
@@ -52,7 +95,11 @@ const Home = ({ handleLogout }) => {
           </Card>
         )}
         <Card
-          style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
+          style={{
+            width: "12rem",
+            cursor: "pointer",
+            alignItems: "center",
+          }}
           onClick={() => navigate("/dashboard")}
         >
           <Card.Body className="d-flex flex-column align-items-center">
