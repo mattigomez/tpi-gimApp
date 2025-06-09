@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import Header from "../header/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authFetch } from "../../services/authFetch";
+import { AuthContext } from "../../services/authContext/Auth.context";
+import { jwtDecode } from "../../services/jwtDecode";
 
-const Account = ({ userEmail,handleLogout }) => {
+const Account = ({ handleLogout }) => {
+  const { token } = useContext(AuthContext);
+  let userId = "";
+  let emailFromToken = "";
+  if (token) {
+    const user = jwtDecode(token);
+    userId = user?.id || ""; // <-- el id debe venir en el token
+    emailFromToken = user?.email || "";
+  }
+
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -13,75 +24,123 @@ const Account = ({ userEmail,handleLogout }) => {
     estatura: "",
     peso: "",
     telefono: "",
-    correo: userEmail || "usuario@ejemplo.com",
+    correo: emailFromToken,
+  });
+
+  const [passwordData, setPasswordData] = useState({
     password: "",
     newPassword: "",
     confirmNewPassword: "",
   });
 
+  // Traer datos del usuario al montar
+  useEffect(() => {
+    if (userId) {
+      authFetch(`http://localhost:3000/partners/${userId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFormData((prev) => ({
+            ...prev,
+            nombre: data.nombre || "",
+            apellido: data.apellido || "",
+            edad: data.edad || "",
+            estatura: data.estatura || "",
+            peso: data.peso || "",
+            telefono: data.telefono || "",
+            correo: data.email || emailFromToken,
+          }));
+        })
+        .catch(() => {
+          toast.error("No se pudo cargar la información del usuario");
+        });
+    }
+  }, [userId, emailFromToken]);
+
+  // Manejar cambios en datos personales
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
 
+  // Manejar cambios en contraseña
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Guardar datos personales
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validar cambio de contraseña si se completó
-    if (formData.newPassword || formData.confirmNewPassword) {
-      if (formData.newPassword !== formData.confirmNewPassword) {
-        toast.error("Las contraseñas nuevas no coinciden");
-        return;
-      }
-      if (formData.newPassword.length < 6) {
-        toast.error("La nueva contraseña debe tener al menos 6 caracteres");
-        return;
-      }
-    }
-
-    // Preparar datos para enviar (no enviar campos de password vacíos)
-    const payload = {
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      edad: formData.edad,
-      estatura: formData.estatura,
-      peso: formData.peso,
-      telefono: formData.telefono,
-      correo: formData.correo,
-    };
-    if (formData.newPassword) {
-      payload.newPassword = formData.newPassword;
-      payload.password = formData.password; // Para verificar la actual
-    }
-
     try {
       const res = await authFetch(
-        `http://localhost:3000/users/${formData.correo}`,
+        `http://localhost:3000/partners/${userId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
         }
       );
       if (res.ok) {
         toast.success("Datos guardados correctamente");
-        setFormData((prev) => ({
-          ...prev,
-          password: "",
-          newPassword: "",
-          confirmNewPassword: "",
-        }));
       } else {
         const data = await res.json();
         toast.error(data.message || "Error al guardar los datos");
       }
-    } catch (err) {
-      toast.error(err, "Error de conexión con el servidor");
+    } catch {
+      toast.error("Error de conexión con el servidor");
+    }
+  };
+
+  // Cambiar contraseña (si tenés endpoint /partners/:id/password)
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (
+      !passwordData.password ||
+      !passwordData.newPassword ||
+      !passwordData.confirmNewPassword
+    ) {
+      toast.error("Complete todos los campos de contraseña");
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmNewPassword) {
+      toast.error("Las contraseñas nuevas no coinciden");
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      toast.error("La nueva contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+    try {
+      const res = await authFetch(
+        `http://localhost:3000/partners/${userId}/password`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            password: passwordData.password,
+            newPassword: passwordData.newPassword,
+          }),
+        }
+      );
+      if (res.ok) {
+        toast.success("Contraseña actualizada correctamente");
+        setPasswordData({
+          password: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Error al cambiar la contraseña");
+      }
+    } catch {
+      toast.error("Error de conexión con el servidor");
     }
   };
 
@@ -191,24 +250,29 @@ const Account = ({ userEmail,handleLogout }) => {
                   readOnly
                 />
               </Form.Group>
-              <hr />
-              <h3
-                className="mb-3"
-                style={{
-                  fontFamily: "Orbitron, Arial, sans-serif",
-                  fontWeight: 700,
-                  color: "#fff",
-                }}
-              >
-                Cambiar contraseña
-              </h3>
+              <Button variant="primary" type="submit">
+                Guardar
+              </Button>
+            </Form>
+            <hr />
+            <h3
+              className="mb-3"
+              style={{
+                fontFamily: "Orbitron, Arial, sans-serif",
+                fontWeight: 700,
+                color: "#fff",
+              }}
+            >
+              Cambiar contraseña
+            </h3>
+            <Form onSubmit={handlePasswordSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Contraseña actual</Form.Label>
                 <Form.Control
                   type="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={passwordData.password}
+                  onChange={handlePasswordChange}
                   placeholder="Ingrese su contraseña actual"
                   autoComplete="current-password"
                 />
@@ -218,8 +282,8 @@ const Account = ({ userEmail,handleLogout }) => {
                 <Form.Control
                   type="password"
                   name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
                   placeholder="Ingrese la nueva contraseña"
                   autoComplete="new-password"
                 />
@@ -229,14 +293,14 @@ const Account = ({ userEmail,handleLogout }) => {
                 <Form.Control
                   type="password"
                   name="confirmNewPassword"
-                  value={formData.confirmNewPassword}
-                  onChange={handleChange}
+                  value={passwordData.confirmNewPassword}
+                  onChange={handlePasswordChange}
                   placeholder="Repita la nueva contraseña"
                   autoComplete="new-password"
                 />
               </Form.Group>
               <Button variant="primary" type="submit">
-                Guardar
+                Cambiar contraseña
               </Button>
             </Form>
           </Card.Body>

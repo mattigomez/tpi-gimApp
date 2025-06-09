@@ -1,14 +1,25 @@
 import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import Header from "../header/Header";
+import { useContext } from "react";
+import { AuthContext } from "../../services/authContext/Auth.context";
+import { jwtDecode } from "../../services/jwtDecode";
 
-const Home = ({ userType, handleLogout}) => {
+const Home = ({ handleLogout }) => {
   const navigate = useNavigate();
-  
+
+  // Obtener el rol del usuario desde el token
+  const { token } = useContext(AuthContext);
+  let userRole = null;
+  if (token) {
+    const user = jwtDecode(token);
+    userRole = user?.role;
+  }
+
   return (
     <div
       style={{
-        marginTop: "100px",
+        marginTop: "260px",
         padding: "100px",
         background: "#222",
         display: "flex",
@@ -17,7 +28,7 @@ const Home = ({ userType, handleLogout}) => {
         justifyContent: "center",
       }}
     >
-       <Header onLogout={handleLogout} />
+      <Header onLogout={handleLogout} />
       <h2 style={{ color: "#fff", marginBottom: "32px", letterSpacing: "2px" }}>TABLERO</h2>
       <div style={{ display: "flex", gap: "32px" }}>
         <Card
@@ -29,15 +40,17 @@ const Home = ({ userType, handleLogout}) => {
             <Card.Title>Cuenta</Card.Title>
           </Card.Body>
         </Card>
-        <Card
-          style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
-          onClick={() => navigate("/partners")}
-        >
-          <Card.Body className="d-flex flex-column align-items-center">
-            <span style={{ fontSize: "48px", marginBottom: "12px" }}>📈</span>
-            <Card.Title>Socios</Card.Title>
-          </Card.Body>
-        </Card>
+        {(userRole === "admin" || userRole === "trainer") && (
+          <Card
+            style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
+            onClick={() => navigate("/partners")}
+          >
+            <Card.Body className="d-flex flex-column align-items-center">
+              <span style={{ fontSize: "48px", marginBottom: "12px" }}>📈</span>
+              <Card.Title>Socios</Card.Title>
+            </Card.Body>
+          </Card>
+        )}
         <Card
           style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
           onClick={() => navigate("/dashboard")}
@@ -47,17 +60,6 @@ const Home = ({ userType, handleLogout}) => {
             <Card.Title>Rutinas</Card.Title>
           </Card.Body>
         </Card>
-        {userType === "admin" && (
-          <Card
-            style={{ width: "12rem", cursor: "pointer", alignItems: "center" }}
-            onClick={() => navigate("/admin")}
-          >
-            <Card.Body className="d-flex flex-column align-items-center">
-              <span style={{ fontSize: "48px", marginBottom: "12px" }}>⚙️</span>
-              <Card.Title>Admin</Card.Title>
-            </Card.Body>
-          </Card>
-        )}
       </div>
     </div>
   );
