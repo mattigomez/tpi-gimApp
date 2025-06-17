@@ -32,7 +32,7 @@ const App = () => {
             <Route path="/dashboard/*" element={<Dashboard />} />
              <Route path="/account" element={<Account />} />
           </Route>
-          <Route element={<Protected allowedRoles={["admin", "profesor"]} />}>
+          <Route element={<Protected allowedRoles={["admin", "trainer"]} />}>
           <Route path="/partners" element={<Partners />} />
           </Route>
           <Route path="*" element={<NotFound />} />
