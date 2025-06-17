@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AuthContext } from "./Auth.context";
+import { jwtDecode } from "jwt-decode";
 
 const tokenSaved = localStorage.getItem("GymHub-2025");
 
@@ -9,6 +10,11 @@ const AuthContextProvider = ({ children }) => {
   const handleUserLogin = (newToken) => {
     localStorage.setItem("GymHub-2025", newToken);
     setToken(newToken);
+
+    const decoded = jwtDecode(newToken);
+    localStorage.setItem("GymHub-UserRole", decoded.role);
+    localStorage.setItem("GymHub-UserId", decoded.id);
+    localStorage.setItem("GymHub-UserEmail", decoded.email);
   };
 
   const handleUserLogout = () => {
