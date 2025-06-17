@@ -4,6 +4,7 @@ import Routines from "../routines/Routines";
 import NewRoutine from "../newRoutine/NewRoutine";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
+import Protected from "../routes/protected/Protected";
 
 const Dashboard = ({ handleLogout }) => {
   const [routines, setRoutines] = useState([]);
@@ -42,10 +43,12 @@ const Dashboard = ({ handleLogout }) => {
       <Header onLogout={handleLogout} />
       <Routes>
         <Route index element={<Routines routines={routines} />} />
-        <Route
-          path="add-routine"
-          element={<NewRoutine onAddRoutine={refreshRoutines} />}
-        />
+        <Route element={<Protected allowedRoles={["admin", "trainer"]} />}>
+          <Route
+            path="add-routine"
+            element={<NewRoutine onAddRoutine={refreshRoutines} />}
+          />
+        </Route>
       </Routes>
     </div>
   );
