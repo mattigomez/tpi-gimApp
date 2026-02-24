@@ -3,7 +3,7 @@ import RoutineItem from "../routineItem/RoutineItem";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../../services/authContext/Auth.context";
-import { jwtDecode } from "../../services/jwtDecode";
+import { getUserClaims, normalizeRole } from "../../services/jwtClaims";
 import { authFetch } from "../../services/authFetch";
 
 const Routines = ({ routines }) => {
@@ -31,9 +31,11 @@ const Routines = ({ routines }) => {
 
   useEffect(() => {
     if (!token) return;
-    const user = jwtDecode(token);
-    if (!user?.id) return;
-    authFetch(`http://localhost:3000/partners/${user.id}`)
+    const claims = getUserClaims(token);
+    const role = normalizeRole(claims?.role);
+    // Solo clientes tienen /Users/me
+    if (role !== "user") { setUserInfo({ role }); return; }
+    authFetch(`/Users/me`)
       .then((res) => res.json())
       .then((data) => setUserInfo(data))
       .catch(() => setUserInfo(null));
@@ -41,14 +43,13 @@ const Routines = ({ routines }) => {
 
 
   useEffect(() => {
-    if (!userInfo?.activeRoutineId) {
+    if (!userInfo?.activeRoutine?.id) {
       setAssignedRoutine(null);
       return;
     }
     const found = routines.find(
       (r) =>
-        r.id === userInfo.activeRoutineId ||
-        r.id === Number(userInfo.activeRoutineId)
+        r.id === userInfo.activeRoutine.id
     );
     setAssignedRoutine(found || null);
   }, [userInfo, routines]);

@@ -4,10 +4,13 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { authFetch } from "../../services/authFetch";
 
+const levelToInt = (l) =>
+  ({ Principiante: 1, Intermedio: 2, Avanzado: 3, principiante: 1, intermedio: 2, avanzado: 3 }[l] ?? 1);
+
 const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
-  const [level, setLevel] = useState(initialData?.level || "principiante");
+  const [level, setLevel] = useState(levelToInt(initialData?.level));
   const [exercises, setExercises] = useState(initialData?.exercises || []);
   const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState("");
@@ -25,7 +28,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    authFetch("http://localhost:3000/exercises")
+    authFetch("/Exercises")
       .then(res => res.json())
       .then(data => setAvailableExercises(data));
   }, []);
@@ -34,7 +37,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     if (isEditMode && initialData) {
       setTitle(initialData.title || "");
       setDescription(initialData.description || "");
-      setLevel(initialData.level || "principiante");
+      setLevel(levelToInt(initialData.level));
       setExercises(initialData.exercises || []);
     }
   }, [initialData, isEditMode]);
@@ -78,7 +81,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     setFormTriedSubmit(true);
     setDuplicateTitleError("");
     try {
-      const resRoutines = await authFetch("http://localhost:3000/routines");
+      const resRoutines = await authFetch("/Routines");
       const routinesList = await resRoutines.json();
       const titleNormalized = title.trim().toLowerCase();
       const duplicate = routinesList.find(r =>
@@ -128,13 +131,13 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     try {
       let res;
       if (isEditMode && initialData?.id) {
-        res = await authFetch(`http://localhost:3000/routines/${initialData.id}`, {
+        res = await authFetch(`/Routines/${initialData.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(routineData),
         });
       } else {
-        res = await authFetch("http://localhost:3000/routines", {
+        res = await authFetch("/Routines", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(routineData),
@@ -191,11 +194,11 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                   <Form.Label>Nivel</Form.Label>
                   <Form.Select
                     value={level}
-                    onChange={(e) => setLevel(e.target.value)}
+                    onChange={(e) => setLevel(Number(e.target.value))}
                   >
-                    <option value="principiante">Principiante</option>
-                    <option value="intermedio">Intermedio</option>
-                    <option value="avanzado">Avanzado</option>
+                    <option value={1}>Principiante</option>
+                    <option value={2}>Intermedio</option>
+                    <option value={3}>Avanzado</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -300,10 +303,12 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                       variant="primary"
                       onClick={async () => {
                         try {
-                          const res = await authFetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
+                          const editingEx = availableExercises.find(e => e.id === editingExerciseId);
+                          const res = await authFetch(`/Exercises/${editingExerciseId}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
+                              name: editingEx?.name ?? "",
                               sets: parseInt(editSets),
                               repetitions: parseInt(editRepetitions),
                             }),
@@ -439,7 +444,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                 variant="danger"
                 onClick={async () => {
                   try {
-                    const res = await authFetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
+                    const res = await authFetch(`/Exercises/${exerciseToDelete.id}`, { method: "DELETE" });
                     if (res.ok) {
                       setAvailableExercises(prev => prev.filter(ej => ej.id !== exerciseToDelete.id));
                       setSelectedExerciseId("");

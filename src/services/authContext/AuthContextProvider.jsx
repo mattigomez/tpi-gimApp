@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AuthContext } from "./Auth.context";
-import { jwtDecode } from "jwt-decode";
+import { getUserClaims, normalizeRole } from "../jwtClaims";
 
 const tokenSaved = localStorage.getItem("GymHub-2025");
 
@@ -11,14 +11,15 @@ const AuthContextProvider = ({ children }) => {
     localStorage.setItem("GymHub-2025", newToken);
     setToken(newToken);
 
-    const decoded = jwtDecode(newToken);
-    localStorage.setItem("GymHub-UserRole", decoded.role);
-    localStorage.setItem("GymHub-UserId", decoded.id);
-    localStorage.setItem("GymHub-UserEmail", decoded.email);
+    const claims = getUserClaims(newToken);
+    localStorage.setItem("GymHub-UserRole", normalizeRole(claims?.role) || "");
+    localStorage.setItem("GymHub-UserEmail", claims?.email || "");
   };
 
   const handleUserLogout = () => {
     localStorage.removeItem("GymHub-2025");
+    localStorage.removeItem("GymHub-UserRole");
+    localStorage.removeItem("GymHub-UserEmail");
     setToken("");
   };
 

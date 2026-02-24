@@ -8,7 +8,7 @@ const Protected = ({allowedRoles}) => {
   if (!token) {
     return <Navigate to='/login' replace />;
   }
-  if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/*" replace />;
+  if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/login" replace />;
   return <Outlet />;
 };
 

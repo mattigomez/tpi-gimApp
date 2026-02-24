@@ -5,16 +5,14 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authFetch } from "../../services/authFetch";
 import { AuthContext } from "../../services/authContext/Auth.context";
-import { jwtDecode } from "../../services/jwtDecode";
+import { getUserClaims } from "../../services/jwtClaims";
 
 const Account = ({ handleLogout }) => {
   const { token } = useContext(AuthContext);
-  let userId = "";
   let emailFromToken = "";
   if (token) {
-    const user = jwtDecode(token);
-    userId = user?.id || "";
-    emailFromToken = user?.email || "";
+    const claims = getUserClaims(token);
+    emailFromToken = claims?.email || "";
   }
 
   const [formData, setFormData] = useState({
@@ -33,18 +31,18 @@ const Account = ({ handleLogout }) => {
     confirmNewPassword: "",
   });
   useEffect(() => {
-    if (userId) {
-      authFetch(`http://localhost:3000/partners/${userId}`)
+    if (token) {
+      authFetch(`/Users/me`)
         .then((res) => res.json())
         .then((data) => {
           setFormData((prev) => ({
             ...prev,
-            nombre: data.nombre || "",
-            apellido: data.apellido || "",
-            edad: data.edad || "",
-            estatura: data.estatura || "",
-            peso: data.peso || "",
-            telefono: data.telefono || "",
+            nombre: data.name || "",
+            apellido: "",
+            edad: data.age ?? "",
+            estatura: data.height ?? "",
+            peso: data.weight ?? "",
+            telefono: data.phone || "",
             correo: data.email || emailFromToken,
           }));
         })
@@ -52,7 +50,7 @@ const Account = ({ handleLogout }) => {
           toast.error("No se pudo cargar la información del usuario");
         });
     }
-  }, [userId, emailFromToken]);
+  }, [token, emailFromToken]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,18 +90,26 @@ const Account = ({ handleLogout }) => {
     }
     try {
       const res = await authFetch(
-        `http://localhost:3000/partners/${userId}`,
+        `/Users/me`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            name: formData.nombre,
+            age: formData.edad === "" ? null : Number(formData.edad),
+            height: formData.estatura === "" ? null : Number(formData.estatura),
+            weight: formData.peso === "" ? null : Number(formData.peso),
+            phone: formData.telefono || null
+          }),
         }
       );
       if (res.ok) {
         toast.success("Datos guardados correctamente");
       } else {
-        const data = await res.json();
-        toast.error(data.message || "Error al guardar los datos");
+        const text = await res.text().catch(() => "");
+        let msg = text;
+        try { msg = JSON.parse(text)?.message || text; } catch { /* plain text */ }
+        toast.error(msg || "Error al guardar los datos");
       }
     } catch {
       toast.error("Error de conexión con el servidor");
@@ -130,7 +136,7 @@ const Account = ({ handleLogout }) => {
     }
     try {
       const res = await authFetch(
-        `http://localhost:3000/partners/${userId}/password`,
+        `/Users/me/password`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -148,8 +154,10 @@ const Account = ({ handleLogout }) => {
           confirmNewPassword: "",
         });
       } else {
-        const data = await res.json();
-        toast.error(data.message || "Error al cambiar la contraseña");
+        const text = await res.text().catch(() => "");
+        let msg = text;
+        try { msg = JSON.parse(text)?.message || text; } catch { /* plain text */ }
+        toast.error(msg || "Error al cambiar la contraseña");
       }
     } catch {
       toast.error("Error de conexión con el servidor");

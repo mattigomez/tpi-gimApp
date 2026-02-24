@@ -3,7 +3,8 @@ import { useNavigate } from "react-router";
 import Header from "../header/Header";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../services/authContext/Auth.context";
-import { jwtDecode } from "../../services/jwtDecode";
+import { authFetch } from "../../services/authFetch";
+import { getUserClaims, normalizeRole } from "../../services/jwtClaims";
 
 const Home = ({ handleLogout }) => {
   const navigate = useNavigate();
@@ -12,33 +13,35 @@ const Home = ({ handleLogout }) => {
   const [saludo, setSaludo] = useState("Bienvenido");
 
   useEffect(() => {
-    if (token) {
-      const user = jwtDecode(token);
-      fetch(`http://localhost:3000/partners/${user?.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+    if (!token) return;
+
+    const claims = getUserClaims(token);
+    const email = claims?.email;
+
+    // Para clientes existe /Users/me (si no es cliente puede dar 403)
+    authFetch("/Users/me")
+      .then(async (res) => {
+        if (!res.ok) throw new Error("no-profile");
+        return res.json();
       })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data && data.nombre) {
-            setSaludo(`Bienvenido ${data.nombre}`);
-          } else if (user?.email) {
-            setSaludo(`Bienvenido ${user.email}`);
-          } else {
-            setSaludo("Bienvenido");
-          }
-        })
-        .catch(() => {
-          if (user?.email) setSaludo(`Bienvenido ${user.email}`);
-          else setSaludo("Bienvenido");
-        });
-    }
+      .then((data) => {
+        if (data?.name) setSaludo(`Bienvenido ${data.name}`);
+        else if (data?.email) setSaludo(`Bienvenido ${data.email}`);
+        else if (email) setSaludo(`Bienvenido ${email}`);
+        else setSaludo("Bienvenido");
+      })
+      .catch(() => {
+        if (email) setSaludo(`Bienvenido ${email}`);
+        else setSaludo("Bienvenido");
+      });
   }, [token]);
+
 
 
   let userRole = null;
   if (token) {
-    const user = jwtDecode(token);
-    userRole = user?.role;
+    const claims = getUserClaims(token);
+    userRole = normalizeRole(claims?.role);
   }
 
   return (

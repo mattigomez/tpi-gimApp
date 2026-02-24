@@ -1,11 +1,24 @@
+// Default: Azure App Service (backend deployed)
+// Override locally by creating a `.env.local` with:
+//   VITE_API_URL=http://localhost:5000/api
+export const API_BASE_URL =
+  import.meta?.env?.VITE_API_URL ??
+  "https://gimapp-api-tup-fgfgd6f3e6c9hehj.brazilsouth-01.azurewebsites.net/api";
 
-export const authFetch = (url, options = {}) => {
+export const authFetch = (endpoint, options = {}) => {
   const token = localStorage.getItem("GymHub-2025");
+
+  // Allow calling with absolute URLs too
+  const url = /^https?:\/\//i.test(endpoint)
+    ? endpoint
+    : `${API_BASE_URL}${endpoint}`;
+
   return fetch(url, {
     ...options,
     headers: {
-      ...(options.headers || {}),
-      Authorization: token ? `Bearer ${token}` : undefined,
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
     },
   });
 };
