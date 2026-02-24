@@ -29,8 +29,12 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
 
   useEffect(() => {
     authFetch("/Exercises")
-      .then(res => res.json())
-      .then(data => setAvailableExercises(data));
+      .then(res => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then(data => setAvailableExercises(Array.isArray(data) ? data : []))
+      .catch(() => setAvailableExercises([]));
   }, []);
 
   useEffect(() => {
@@ -42,19 +46,34 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     }
   }, [initialData, isEditMode]);
 
-  const handleAddExercise = () => {
-    if (exerciseName && sets && (repetitions || repetitions === 0)) {
-      setExercises([
-        ...exercises,
-        {
+  const handleAddExercise = async () => {
+    if (!exerciseName || !sets || !repetitions) return;
+    try {
+      const res = await authFetch("/Exercises", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           name: exerciseName,
           sets: parseInt(sets),
           repetitions: parseInt(repetitions),
-        },
-      ]);
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        let msg = text;
+        try { msg = JSON.parse(text)?.message || text; } catch { /* plain text */ }
+        toast.error(msg || "Error al crear el ejercicio");
+        return;
+      }
+      const created = await res.json();
+      const newEx = { id: created.id, name: exerciseName, sets: parseInt(sets), repetitions: parseInt(repetitions) };
+      setAvailableExercises(prev => [...prev, newEx]);
+      setExercises(prev => [...prev, newEx]);
       setExerciseName("");
       setSets("");
       setRepetitions("");
+    } catch {
+      toast.error("Error de conexión al crear el ejercicio");
     }
   };
 
@@ -80,20 +99,18 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     event.preventDefault();
     setFormTriedSubmit(true);
     setDuplicateTitleError("");
+    let routinesList = [];
     try {
       const resRoutines = await authFetch("/Routines");
-      const routinesList = await resRoutines.json();
-      const titleNormalized = title.trim().toLowerCase();
-      const duplicate = routinesList.find(r =>
-        r.title.trim().toLowerCase() === titleNormalized &&
-        (!isEditMode || r.id !== initialData?.id)
-      );
-      if (duplicate) {
-        setDuplicateTitleError("El nombre de rutina ya está en uso");
-        return;
-      }
-    } catch {
-      setDuplicateTitleError("No se pudo validar el nombre de la rutina");
+      if (resRoutines.ok) routinesList = await resRoutines.json();
+    } catch { /* lista vacía, sin bloqueo */ }
+    const titleNormalized = title.trim().toLowerCase();
+    const duplicate = routinesList.find(r =>
+      r.title.trim().toLowerCase() === titleNormalized &&
+      (!isEditMode || r.id !== initialData?.id)
+    );
+    if (duplicate) {
+      setDuplicateTitleError("El nombre de rutina ya está en uso");
       return;
     }
     if (title.length > 60) {
@@ -122,12 +139,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
       }
     }
 
-    const routineData = {
-      title,
-      description,
-      level,
-      exercises,
-    };
+    const routineData = { title, description, level };
     try {
       let res;
       if (isEditMode && initialData?.id) {
@@ -143,18 +155,44 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
           body: JSON.stringify(routineData),
         });
       }
-      if (res.ok) {
-        setTitle("");
-        setDescription("");
-        setLevel("principiante");
-        setExercises([]);
-        toast.success(isEditMode ? "Rutina actualizada con éxito" : "Rutina creada con éxito");
-        if (typeof window.refreshRoutines === "function") window.refreshRoutines();
-        if (onClose) onClose();
-        if (!isEditMode) navigate("/dashboard");
-      } else {
+      if (!res.ok) {
         toast.error(isEditMode ? "Error al actualizar rutina" : "Error al crear rutina");
+        return;
       }
+
+      // Obtener routineId para asociar ejercicios
+      let routineId = initialData?.id;
+      if (!isEditMode) {
+        const created = await res.json();
+        routineId = created.id;
+      }
+
+      // Asociar cada ejercicio de la lista a la rutina
+      const alreadyAssociated = new Set((initialData?.exercises || []).map(e => e.id));
+      for (const ex of exercises) {
+        if (ex.id && !alreadyAssociated.has(ex.id)) {
+          await authFetch(`/Exercises/${ex.id}/associate/${routineId}`, { method: "PUT" });
+        }
+      }
+
+      // Desasociar ejercicios que se quitaron (solo en modo edición)
+      if (isEditMode) {
+        const currentIds = new Set(exercises.filter(e => e.id).map(e => e.id));
+        for (const ex of (initialData?.exercises || [])) {
+          if (ex.id && !currentIds.has(ex.id)) {
+            await authFetch(`/Exercises/${ex.id}/disassociate/${routineId}`, { method: "DELETE" });
+          }
+        }
+      }
+
+      setTitle("");
+      setDescription("");
+      setLevel(1);
+      setExercises([]);
+      toast.success(isEditMode ? "Rutina actualizada con éxito" : "Rutina creada con éxito");
+      if (typeof window.refreshRoutines === "function") window.refreshRoutines();
+      if (onClose) onClose();
+      if (!isEditMode) navigate("/dashboard");
     } catch {
       toast.error("Error de conexión");
     }
