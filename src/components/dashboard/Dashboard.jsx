@@ -10,13 +10,13 @@ const Dashboard = ({ handleLogout }) => {
   const [routines, setRoutines] = useState([]);
 
   useEffect(() => {
-    authFetch("http://localhost:3000/routines")
+    authFetch("/Routines")
       .then((res) => res.json())
       .then((data) => setRoutines(data));
   }, []);
 
   const refreshRoutines = () => {
-    authFetch("http://localhost:3000/routines")
+    authFetch("/Routines")
       .then((res) => res.json())
       .then((data) => setRoutines(data));
   };

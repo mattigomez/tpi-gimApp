@@ -4,10 +4,13 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { authFetch } from "../../services/authFetch";
 
+const levelToInt = (l) =>
+  ({ Principiante: 1, Intermedio: 2, Avanzado: 3, principiante: 1, intermedio: 2, avanzado: 3 }[l] ?? 1);
+
 const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
-  const [level, setLevel] = useState(initialData?.level || "principiante");
+  const [level, setLevel] = useState(levelToInt(initialData?.level));
   const [exercises, setExercises] = useState(initialData?.exercises || []);
   const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState("");
@@ -25,33 +28,52 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    authFetch("http://localhost:3000/exercises")
-      .then(res => res.json())
-      .then(data => setAvailableExercises(data));
+    authFetch("/Exercises")
+      .then(res => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then(data => setAvailableExercises(Array.isArray(data) ? data : []))
+      .catch(() => setAvailableExercises([]));
   }, []);
 
   useEffect(() => {
     if (isEditMode && initialData) {
       setTitle(initialData.title || "");
       setDescription(initialData.description || "");
-      setLevel(initialData.level || "principiante");
+      setLevel(levelToInt(initialData.level));
       setExercises(initialData.exercises || []);
     }
   }, [initialData, isEditMode]);
 
-  const handleAddExercise = () => {
-    if (exerciseName && sets && (repetitions || repetitions === 0)) {
-      setExercises([
-        ...exercises,
-        {
+  const handleAddExercise = async () => {
+    if (!exerciseName || !sets || !repetitions) return;
+    try {
+      const res = await authFetch("/Exercises", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           name: exerciseName,
           sets: parseInt(sets),
           repetitions: parseInt(repetitions),
-        },
-      ]);
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        let msg = text;
+        try { msg = JSON.parse(text)?.message || text; } catch { /* plain text */ }
+        toast.error(msg || "Error al crear el ejercicio");
+        return;
+      }
+      const created = await res.json();
+      const newEx = { id: created.id, name: exerciseName, sets: parseInt(sets), repetitions: parseInt(repetitions) };
+      setAvailableExercises(prev => [...prev, newEx]);
+      setExercises(prev => [...prev, newEx]);
       setExerciseName("");
       setSets("");
       setRepetitions("");
+    } catch {
+      toast.error("Error de conexión al crear el ejercicio");
     }
   };
 
@@ -77,20 +99,18 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
     event.preventDefault();
     setFormTriedSubmit(true);
     setDuplicateTitleError("");
+    let routinesList = [];
     try {
-      const resRoutines = await authFetch("http://localhost:3000/routines");
-      const routinesList = await resRoutines.json();
-      const titleNormalized = title.trim().toLowerCase();
-      const duplicate = routinesList.find(r =>
-        r.title.trim().toLowerCase() === titleNormalized &&
-        (!isEditMode || r.id !== initialData?.id)
-      );
-      if (duplicate) {
-        setDuplicateTitleError("El nombre de rutina ya está en uso");
-        return;
-      }
-    } catch {
-      setDuplicateTitleError("No se pudo validar el nombre de la rutina");
+      const resRoutines = await authFetch("/Routines");
+      if (resRoutines.ok) routinesList = await resRoutines.json();
+    } catch { /* lista vacía, sin bloqueo */ }
+    const titleNormalized = title.trim().toLowerCase();
+    const duplicate = routinesList.find(r =>
+      r.title.trim().toLowerCase() === titleNormalized &&
+      (!isEditMode || r.id !== initialData?.id)
+    );
+    if (duplicate) {
+      setDuplicateTitleError("El nombre de rutina ya está en uso");
       return;
     }
     if (title.length > 60) {
@@ -119,39 +139,60 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
       }
     }
 
-    const routineData = {
-      title,
-      description,
-      level,
-      exercises,
-    };
+    const routineData = { title, description, level };
     try {
       let res;
       if (isEditMode && initialData?.id) {
-        res = await authFetch(`http://localhost:3000/routines/${initialData.id}`, {
+        res = await authFetch(`/Routines/${initialData.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(routineData),
         });
       } else {
-        res = await authFetch("http://localhost:3000/routines", {
+        res = await authFetch("/Routines", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(routineData),
         });
       }
-      if (res.ok) {
-        setTitle("");
-        setDescription("");
-        setLevel("principiante");
-        setExercises([]);
-        toast.success(isEditMode ? "Rutina actualizada con éxito" : "Rutina creada con éxito");
-        if (typeof window.refreshRoutines === "function") window.refreshRoutines();
-        if (onClose) onClose();
-        if (!isEditMode) navigate("/dashboard");
-      } else {
+      if (!res.ok) {
         toast.error(isEditMode ? "Error al actualizar rutina" : "Error al crear rutina");
+        return;
       }
+
+      // Obtener routineId para asociar ejercicios
+      let routineId = initialData?.id;
+      if (!isEditMode) {
+        const created = await res.json();
+        routineId = created.id;
+      }
+
+      // Asociar cada ejercicio de la lista a la rutina
+      const alreadyAssociated = new Set((initialData?.exercises || []).map(e => e.id));
+      for (const ex of exercises) {
+        if (ex.id && !alreadyAssociated.has(ex.id)) {
+          await authFetch(`/Exercises/${ex.id}/associate/${routineId}`, { method: "PUT" });
+        }
+      }
+
+      // Desasociar ejercicios que se quitaron (solo en modo edición)
+      if (isEditMode) {
+        const currentIds = new Set(exercises.filter(e => e.id).map(e => e.id));
+        for (const ex of (initialData?.exercises || [])) {
+          if (ex.id && !currentIds.has(ex.id)) {
+            await authFetch(`/Exercises/${ex.id}/disassociate/${routineId}`, { method: "DELETE" });
+          }
+        }
+      }
+
+      setTitle("");
+      setDescription("");
+      setLevel(1);
+      setExercises([]);
+      toast.success(isEditMode ? "Rutina actualizada con éxito" : "Rutina creada con éxito");
+      if (typeof window.refreshRoutines === "function") window.refreshRoutines();
+      if (onClose) onClose();
+      if (!isEditMode) navigate("/dashboard");
     } catch {
       toast.error("Error de conexión");
     }
@@ -191,11 +232,11 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                   <Form.Label>Nivel</Form.Label>
                   <Form.Select
                     value={level}
-                    onChange={(e) => setLevel(e.target.value)}
+                    onChange={(e) => setLevel(Number(e.target.value))}
                   >
-                    <option value="principiante">Principiante</option>
-                    <option value="intermedio">Intermedio</option>
-                    <option value="avanzado">Avanzado</option>
+                    <option value={1}>Principiante</option>
+                    <option value={2}>Intermedio</option>
+                    <option value={3}>Avanzado</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -300,10 +341,12 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                       variant="primary"
                       onClick={async () => {
                         try {
-                          const res = await authFetch(`http://localhost:3000/exercises/${editingExerciseId}`, {
+                          const editingEx = availableExercises.find(e => e.id === editingExerciseId);
+                          const res = await authFetch(`/Exercises/${editingExerciseId}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
+                              name: editingEx?.name ?? "",
                               sets: parseInt(editSets),
                               repetitions: parseInt(editRepetitions),
                             }),
@@ -439,7 +482,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                 variant="danger"
                 onClick={async () => {
                   try {
-                    const res = await authFetch(`http://localhost:3000/exercises/${exerciseToDelete.id}`, { method: "DELETE" });
+                    const res = await authFetch(`/Exercises/${exerciseToDelete.id}`, { method: "DELETE" });
                     if (res.ok) {
                       setAvailableExercises(prev => prev.filter(ej => ej.id !== exerciseToDelete.id));
                       setSelectedExerciseId("");

@@ -5,7 +5,7 @@ import NewRoutine from "../newRoutine/NewRoutine";
 import { authFetch } from "../../services/authFetch";
 import './routineItem.css';
 import { AuthContext } from "../../services/authContext/Auth.context";
-import { jwtDecode } from "../../services/jwtDecode";
+import { getUserClaims, normalizeRole } from "../../services/jwtClaims";
 
 const RoutineItem = ({
     title,
@@ -22,8 +22,7 @@ const RoutineItem = ({
     const { token } = useContext(AuthContext);
     let userRole = null;
     if (token) {
-        const user = jwtDecode(token);
-        userRole = user?.role;
+        userRole = normalizeRole(getUserClaims(token)?.role);
     }
 
     const handleEdit = () => {
@@ -33,7 +32,7 @@ const RoutineItem = ({
 
     const handleDelete = async () => {
         try {
-            const res = await authFetch(`http://localhost:3000/routines/${id}`, { method: "DELETE" });
+            const res = await authFetch(`/Routines/${id}`, { method: "DELETE" });
             if (res.ok) {
                 setShowDeleteModal(false);
                 if (refreshRoutines) refreshRoutines();

@@ -25,7 +25,7 @@ const Header = () => {
       <Container>
         <Navbar.Brand href="home">
           <img
-            src="/src/assets/logowhite-GYMHUB.png"
+            src="/logowhite-GYMHUB.png"
             alt="GYMHUB Logo"
             height="60"
             className="d-inline-block align-top"
