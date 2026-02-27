@@ -1,16 +1,18 @@
 import { useRef, useState, useContext } from "react";
-import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
+import { Button, Form, FormGroup } from "react-bootstrap";
 import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { AuthContext } from "../../../services/authContext/Auth.context";
 import { validateEmail, validatePassword } from "../auth.services";
-
 import { API_BASE_URL } from "../../../services/authFetch";
+import { Eye, EyeSlash } from "react-bootstrap-icons";
 import "./Login.css";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({
     email: false,
     password: false,
@@ -64,18 +66,16 @@ const Login = ({ onLogin }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      // Tu API devuelve token en TEXT/PLAIN
       const text = await res.text();
 
       if (res.ok && text) {
-        handleUserLogin(text); // guarda token y decodifica role/id/email
+        handleUserLogin(text);
         onLogin?.();
         toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
         navigate("/home");
         return;
       }
 
-      // Si no fue ok, el backend devuelve texto tipo "Credenciales inválidas"
       toast.error(text || "Credenciales incorrectas");
     } catch (error) {
       toast.error("Error de conexión");
@@ -83,54 +83,78 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        background: "var(--my-bg)",
-      }}
-    >
-      <Card className="mt-5 mx-3 p-3 px-5 shadow">
-        <Card.Body>
-          <Row className="mb-2">
-            <h5>GymHub</h5>
-          </Row>
+    <div className="login-container">
+      <div className="login-gradient"></div>
+      <div className="login-content">
+        <div className="login-card">
+          <div className="login-header">
+            <div className="logo-icon">💪</div>
+            <h1 className="login-title">GymHub</h1>
+            <p className="login-subtitle">Tu compañero de entrenamiento</p>
+          </div>
 
-          <Form onSubmit={handleSubmit}>
-            <FormGroup className="mb-4">
-              <Form.Control
-                type="text"
-                className={`input-email ${errors.email ? "border border-danger" : ""}`}
-                placeholder="Ingresar email"
-                onChange={handleEmailChange}
-                value={email}
-                ref={emailRef}
-                autoComplete="email"
-              />
-              {errors.email && <p className="text-danger">El correo no es válido</p>}
+          <Form onSubmit={handleSubmit} className="login-form">
+            <FormGroup className="form-group-custom">
+              <Form.Label className="form-label">Email</Form.Label>
+              <div className="input-wrapper">
+                <Form.Control
+                  type="text"
+                  className={`input-custom ${errors.email ? "has-error" : ""}`}
+                  placeholder="usuario@ejemplo.com"
+                  onChange={handleEmailChange}
+                  value={email}
+                  ref={emailRef}
+                  autoComplete="email"
+                />
+              </div>
+              {errors.email && <p className="error-text">El correo no es válido</p>}
             </FormGroup>
 
-            <FormGroup className="mb-4">
-              <Form.Control
-                type="password"
-                placeholder="Ingresar contraseña"
-                onChange={handlePasswordChange}
-                value={password}
-                ref={passwordRef}
-                autoComplete="current-password"
-              />
-              {errors.password && <p className="text-danger">La contraseña no es válida</p>}
+            <FormGroup className="form-group-custom">
+              <Form.Label className="form-label">Contraseña</Form.Label>
+              <div className="input-wrapper password-wrapper">
+                <Form.Control
+                  type={showPassword ? "text" : "password"}
+                  className={`input-custom ${errors.password ? "has-error" : ""}`}
+                  placeholder="••••••••"
+                  onChange={handlePasswordChange}
+                  value={password}
+                  ref={passwordRef}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? "Ocultar" : "Mostrar"}
+                >
+                  {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.password && <p className="error-text">La contraseña no es válida</p>}
             </FormGroup>
 
-            <Row>
-              <Col className="mb-2">
-                <Button variant="secondary" type="submit" className="w-100">
-                  Iniciar sesión
-                </Button>
-              </Col>
-            </Row>
+            <Button type="submit" className="btn-login">
+              Iniciar sesión
+            </Button>
           </Form>
-        </Card.Body>
-      </Card>
+
+          <div className="login-footer">
+            <p>¿No tenés cuenta? Contacta al administrador</p>
+          </div>
+        </div>
+      </div>
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        newestOnTop={true} 
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover 
+      />
     </div>
   );
 };

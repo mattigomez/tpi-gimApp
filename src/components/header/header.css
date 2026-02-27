@@ -1,0 +1,67 @@
+/* Modern header styles */
+.navbar-modern{
+  --header-height: 64px;
+  height: var(--header-height);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(6px) saturate(120%);
+    background: transparent !important; /* fully transparent so header visually belongs to the page */
+    border-bottom: none;
+    box-shadow: none;
+  padding: 6px 0;
+  transition: background 200ms ease, transform 180ms ease;
+}
+
+.navbar-modern .navbar-brand img{
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+.navbar-modern .nav-actions{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-btn{
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.08); /* reduced shadow for better legibility */
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.header-btn-outline{
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.header-btn-danger{
+  background: linear-gradient(180deg, #e04a57, #d73946);
+  border: none;
+  color: #fff;
+}
+
+.navbar-modern.scrolled{
+  background: rgba(6,8,10,0.82) !important;
+  transform: translateY(0);
+}
+
+.navbar-modern .toggle-theme-wrapper{
+  margin-right: 6px;
+}
+
+/* Make header items slightly larger on hover for perceived depth */
+.header-btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(2,6,23,0.12); }
+
+/* small tweak to ToggleTheme placement */
+.navbar-modern .toggle-theme-wrapper{
+  margin-right: 6px;
+}

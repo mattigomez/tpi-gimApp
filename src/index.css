@@ -17,6 +17,11 @@ html, body {
   color: var(--my-text) !important;
 }
 
+:root{
+  /* header height used by components that need offset */
+  --app-header-height: 64px;
+}
+
 html[data-bs-theme='light'] {
   --my-bg: #f8f9fa;
   --my-text: #212529;

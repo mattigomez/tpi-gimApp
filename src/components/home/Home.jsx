@@ -1,4 +1,5 @@
-import { Card } from "react-bootstrap";
+import "./home.css";
+import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import Header from "../header/Header";
 import { useContext, useEffect, useState } from "react";
@@ -47,89 +48,26 @@ const Home = ({ handleLogout }) => {
   return (
     <>
       <Header onLogout={handleLogout} />
-      <div
-        style={{
-          height:"100vh",
-          background: "var(--my-bg)",
-        }}
-      >
-        <div
-          style={{
-            marginTop: "150px",
-            padding: "100px",
-            background: "#222",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-        <h3
-              className="mb-4"
-              style={{
-                fontFamily: "Orbitron, Arial, sans-serif",
-                fontWeight: 700,
-                color: "#fff",
-              }}
-            >
-              {saludo}
-            </h3>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap:"32px"
-            }}
-          >
-            <Card
-              style={{
-                width: "12rem",
-                cursor: "pointer",
-                alignItems: "center",
-                display: "flex",
-                gap: "32px",
-              }}
-              onClick={() => navigate("/account")}
-            >
-              <Card.Body className="d-flex flex-column align-items-center">
-                <span style={{ fontSize: "48px", marginBottom: "12px" }}>
-                  👤
-                </span>
-                <Card.Title>Cuenta</Card.Title>
-              </Card.Body>
-            </Card>
+      <div className="home-page">
+        <div className="home-container">
+          <h3 className="home-header">{saludo}</h3>
+          <div className="home-grid">
+            <div className="home-tile" onClick={() => navigate("/account")} role="button" tabIndex={0}>
+              <div className="icon">👤</div>
+              <div className="title">Cuenta</div>
+            </div>
+
             {(userRole === "admin" || userRole === "trainer") && (
-              <Card
-                style={{
-                  width: "12rem",
-                  cursor: "pointer",
-                  alignItems: "center",
-                }}
-                onClick={() => navigate("/partners")}
-              >
-                <Card.Body className="d-flex flex-column align-items-center">
-                  <span style={{ fontSize: "48px", marginBottom: "12px" }}>
-                    📈
-                  </span>
-                  <Card.Title>Socios</Card.Title>
-                </Card.Body>
-              </Card>
+              <div className="home-tile" onClick={() => navigate("/partners")} role="button" tabIndex={0}>
+                <div className="icon">📈</div>
+                <div className="title">Socios</div>
+              </div>
             )}
-            <Card
-              style={{
-                width: "12rem",
-                cursor: "pointer",
-                alignItems: "center",
-              }}
-              onClick={() => navigate("/dashboard")}
-            >
-              <Card.Body className="d-flex flex-column align-items-center">
-                <span style={{ fontSize: "48px", marginBottom: "12px" }}>
-                  🏋️‍♂️
-                </span>
-                <Card.Title>Rutinas</Card.Title>
-              </Card.Body>
-            </Card>
+
+            <div className="home-tile" onClick={() => navigate("/dashboard")} role="button" tabIndex={0}>
+              <div className="icon">🏋️‍♂️</div>
+              <div className="title">Rutinas</div>
+            </div>
           </div>
         </div>
       </div>

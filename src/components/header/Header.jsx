@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../../services/authContext/Auth.context";
 import ToggleTheme from "../toggleTheme/ToggleTheme";
+import "./header.css";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -21,28 +22,27 @@ const Header = () => {
   };
 
   return (
-    <Navbar fixed="top" expand="lg" bg="dark" data-bs-theme="dark">
+    <Navbar fixed="top" expand="lg" className="navbar-modern" data-bs-theme="dark">
       <Container>
-        <Navbar.Brand href="home">
+        <Navbar.Brand onClick={handleNavigateHome} style={{cursor:'pointer'}}>
           <img
             src="/logowhite-GYMHUB.png"
             alt="GYMHUB Logo"
-            height="60"
             className="d-inline-block align-top"
-          />{" "}
+          />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar-content" />
         <Navbar.Collapse id="navbar-content">
-          <Nav className="ms-auto p-auto align-items-center">
-            <ToggleTheme />
+          <Nav className="ms-auto p-auto align-items-center nav-actions">
+            {/* <div className="toggle-theme-wrapper"><ToggleTheme /></div> */}
             <Button
               variant="outline-light"
-              className="me-2"
+              className="header-btn header-btn-outline"
               onClick={handleNavigateHome}
             >
               Home
             </Button>
-            <Button variant="danger" onClick={handleLogout}>
+            <Button className="header-btn header-btn-danger" onClick={handleLogout}>
               Cerrar sesión
             </Button>
           </Nav>
