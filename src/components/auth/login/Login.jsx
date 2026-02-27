@@ -71,13 +71,12 @@ const Login = ({ onLogin }) => {
       if (res.ok && text) {
         handleUserLogin(text);
         onLogin?.();
-        toast.success("Inicio de sesión exitoso", { autoClose: 3000 });
         navigate("/home");
         return;
       }
 
       toast.error(text || "Credenciales incorrectas");
-    } catch (error) {
+    } catch {
       toast.error("Error de conexión");
     }
   };
