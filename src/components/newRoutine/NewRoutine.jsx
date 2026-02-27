@@ -115,6 +115,10 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
       setDuplicateTitleError("El nombre de rutina ya está en uso");
       return;
     }
+    if (!title.trim()) {
+      toast.error("El título es obligatorio");
+      return;
+    }
     if (title.length > 60) {
       toast.error("El título no puede superar los 60 caracteres");
       return;
