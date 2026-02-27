@@ -115,8 +115,16 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
       setDuplicateTitleError("El nombre de rutina ya está en uso");
       return;
     }
+    if (!title.trim()) {
+      toast.error("El título es obligatorio");
+      return;
+    }
     if (title.length > 60) {
       toast.error("El título no puede superar los 60 caracteres");
+      return;
+    }
+    if (!description.trim()) {
+      toast.error("La descripción es obligatoria");
       return;
     }
     if (description.length > 200) {
@@ -265,7 +273,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                 </Form.Group>
 
                 <Form.Group className="mb-4">
-                  <Form.Label>Descripción (opcional)</Form.Label>
+                  <Form.Label>Descripción</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={4}
@@ -273,7 +281,9 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Descripción breve de la rutina"
                     maxLength={200}
+                    required
                   />
+                  {formTriedSubmit && !description.trim() && <div className="text-danger mt-1">La descripción es obligatoria</div>}
                   <small className="text-muted">{description.length}/200</small>
                 </Form.Group>
 
