@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router";
 import { useEffect, useState, useContext } from "react";
 import Header from "../header/Header";
+import "./partners.css";
 import { authFetch } from "../../services/authFetch";
 import { validateEmail, validatePassword } from "../auth/auth.services";
 import { AuthContext } from "../../services/authContext/Auth.context";
@@ -61,7 +62,7 @@ const Partners = ({ handleLogout }) => {
   useEffect(() => {
     loadUsers();
     loadRoutines();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const handleAssignRoutine = async (userId, routineId) => {
@@ -189,15 +190,8 @@ const Partners = ({ handleLogout }) => {
   return (
     <>
       <Header onLogout={handleLogout} />
-      <div
-        className="d-flex flex-column align-items-center"
-        style={{
-          minHeight: "100vh",
-          paddingTop: "90px",
-          background: "var(--my-bg)",
-        }}
-      >
-        <div className="d-flex justify-content-center m-3" style={{ width: "100%" }}>
+      <div className="partners-page">
+        <div className="d-flex justify-content-center" style={{ width: "100%" }}>
           <Form.Control
             className="routines-search-input"
             type="text"
@@ -212,99 +206,93 @@ const Partners = ({ handleLogout }) => {
             }}
           />
         </div>
-
-        <Card className="m-auto bg-dark p-4" style={{ maxWidth: "1500px", width: "100%" }}>
-          <Card.Body>
-            <div className="d-flex flex-column justify-content-center align-items-center mb-4">
-              <Card.Title className="mb-2 text-center" style={{ fontSize: "1.6rem", fontWeight: 700 }}>
-                Lista de Usuarios
-              </Card.Title>
-
-              {userRole === "admin" && (
-                <Button variant="success" onClick={() => setShowAddUserModal(true)}>
-                  Agregar usuario
-                </Button>
-              )}
-            </div>
-
-            {loading ? (
-              <Spinner animation="border" />
-            ) : (
-              <Row className="justify-content-center">
-                {filteredUsers.map((u) => (
-                  <Col
-                    key={u.id}
-                    md={filteredUsers.length === 1 ? 12 : filteredUsers.length === 2 ? 6 : 4}
-                    className="mb-4 d-flex justify-content-center"
-                    style={filteredUsers.length <= 2 ? { maxWidth: 420 } : {}}
-                  >
-                    <Card className="bg-dark text-white h-100 border rounded w-100">
-                      <Card.Body>
-                        <div>
-                          <div><b>Email:</b> {u.email}</div>
-                          <div><b>Rol:</b> {u.roleName}</div>
-
-                          <div className="mt-2">
-                            <b>Rutina activa:</b>{" "}
-                            {u.activeRoutine?.title ? (
-                              <span>
-                                {u.activeRoutine.title} ({u.activeRoutine.level})
-                              </span>
-                            ) : (
-                              <span className="text-warning">Sin rutina activa</span>
-                            )}
-
-                            {(userRole === "admin" || userRole === "trainer") && (
-                              <div className="mt-2 d-flex gap-2 align-items-center">
-                                <select
-                                  value={u.activeRoutine?.id || ""}
-                                  onChange={(e) => handleAssignRoutine(u.id, e.target.value)}
-                                >
-                                  <option value="">Seleccionar rutina</option>
-                                  {routines.map((r) => (
-                                    <option key={r.id} value={r.id}>
-                                      {r.title} ({r.level})
-                                    </option>
-                                  ))}
-                                </select>
-
-                                {u.activeRoutine?.id && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline-warning"
-                                    onClick={() => handleUnassignRoutine(u.id, u.activeRoutine.id)}
-                                  >
-                                    Quitar
-                                  </Button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </Card.Body>
-
-                      <Card.Footer className="bg-dark border-0">
-                        {userRole === "admin" && (
-                          <Button
-                            variant="danger"
-                            onClick={() => handleShowDeleteModal(u.id)}
-                            className="w-100"
-                          >
-                            Eliminar
-                          </Button>
-                        )}
-                      </Card.Footer>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
+        <div className="partners-container">
+          <div className="partners-header">
+            <h3 style={{ fontSize: "1.4rem", fontWeight: 700, color: '#fff' }}>Lista de Usuarios</h3>
+            {userRole === "admin" && (
+              <Button variant="success" onClick={() => setShowAddUserModal(true)}>
+                Agregar usuario
+              </Button>
             )}
+          </div>
 
-            <Button variant="outline-secondary" onClick={handleGoBack} className="mt-3 w-100">
-              Volver
-            </Button>
-          </Card.Body>
-        </Card>
+          {loading ? (
+            <div style={{ textAlign: 'center' }}><Spinner animation="border" /></div>
+          ) : (
+            <Row className="partners-list">
+              {filteredUsers.map((u) => (
+                <Col
+                  key={u.id}
+                  md={filteredUsers.length === 1 ? 12 : filteredUsers.length === 2 ? 6 : 4}
+                  className="mb-4 d-flex justify-content-center"
+                  style={filteredUsers.length <= 2 ? { maxWidth: 420 } : {}}
+                >
+                  <Card className="partner-card text-white h-100 w-100">
+                    <Card.Body>
+                      <div>
+                        <div><b>Email:</b> {u.email}</div>
+                        <div><b>Rol:</b> {u.roleName}</div>
+
+                        <div className="mt-2">
+                          <b>Rutina activa:</b>{" "}
+                          {u.activeRoutine?.title ? (
+                            <span>
+                              {u.activeRoutine.title} ({u.activeRoutine.level})
+                            </span>
+                          ) : (
+                            <span className="text-warning">Sin rutina activa</span>
+                          )}
+
+                          {(userRole === "admin" || userRole === "trainer") && (
+                            <div className="mt-2 d-flex gap-2 align-items-center">
+                              <select
+                                value={u.activeRoutine?.id || ""}
+                                onChange={(e) => handleAssignRoutine(u.id, e.target.value)}
+                              >
+                                <option value="">Seleccionar rutina</option>
+                                {routines.map((r) => (
+                                  <option key={r.id} value={r.id}>
+                                    {r.title} ({r.level})
+                                  </option>
+                                ))}
+                              </select>
+
+                              {u.activeRoutine?.id && (
+                                <Button
+                                  size="sm"
+                                  variant="outline-warning"
+                                  onClick={() => handleUnassignRoutine(u.id, u.activeRoutine.id)}
+                                >
+                                  Quitar
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Card.Body>
+
+                    <Card.Footer className="bg-transparent border-0">
+                      {userRole === "admin" && (
+                        <Button
+                          variant="danger"
+                          onClick={() => handleShowDeleteModal(u.id)}
+                          className="w-100"
+                        >
+                          Eliminar
+                        </Button>
+                      )}
+                    </Card.Footer>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+
+          <Button variant="outline-secondary" onClick={handleGoBack} className="mt-3 w-100">
+            Volver
+          </Button>
+        </div>
 
         {/* Modal de confirmación */}
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>

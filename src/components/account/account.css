@@ -1,0 +1,301 @@
+/* Styles for Account view */
+.account-page {
+  min-height: 100vh;
+  width: 100%;
+  /* page background image for /account */
+  background-image: linear-gradient(rgba(6,6,6,0.46), rgba(6,6,6,0.46)), url('../../assets/account.jpg');
+  /* reduce visual size so image isn't overly zoomed — keeps aspect ratio */
+  background-size: 100% 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  /* leave space for fixed header */
+  padding-top: calc(var(--app-header-height,64px) + 16px);
+}
+
+
+.account-container{
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: block;
+  /* subtle frosted panel so content stands out over the background */
+  background: linear-gradient(180deg, rgba(10,12,13,0.52), rgba(10,12,13,0.42));
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 18px 40px rgba(2,6,23,0.55), inset 0 1px 0 rgba(255,255,255,0.02);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+.account-title{
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-weight: 700;
+  color: var(--my-text);
+  font-size: 1.18rem; /* slightly smaller */
+  color: #fff;
+  letter-spacing: 0.6px;
+  padding: 8px 4px 6px 4px;
+}
+
+/* New layout: profile panel + form panel */
+.account-grid{
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  width: 100%;
+  gap: 20px;
+  align-items: start;
+}
+
+.avatar{
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(14,165,164,0.95), rgba(45,212,191,0.85));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #042022;
+  font-size: 1.6rem;
+  box-shadow: 0 10px 24px rgba(2,6,23,0.45);
+  overflow: hidden;
+}
+
+.avatar-img{
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 10px 24px rgba(2,6,23,0.35);
+  border: 3px solid rgba(255,255,255,0.06);
+}
+
+/* ensure the avatar overlay is constrained to the avatar circle */
+.avatar-container{
+  position: relative;
+  width: 88px;
+  height: 88px;
+  display: inline-block;
+}
+
+.avatar-overlay{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 160ms ease, transform 160ms ease;
+  z-index: 5;
+}
+
+.avatar-overlay{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.avatar-container:hover .avatar-overlay{
+  opacity: 1;
+}
+
+.avatar-overlay button{
+  background: rgba(255,255,255,0.95);
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  color: var(--my-primary);
+}
+
+.avatar-overlay .icon-btn{
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.avatar-overlay .icon-btn svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.profile-name{
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.profile-role{
+  font-size: 0.95rem;
+}
+
+.profile-stats{
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  justify-content: space-around;
+  margin-top: 6px;
+}
+.profile-panel{
+  /* transparent so page background is visible; keep a subtle gradient for contrast */
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding: 14px 12px;
+  display: flex;
+  justify-content:center;
+  height: stretch;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-item{
+  text-align: center;
+}
+
+.stat-item .label{
+  display:block;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.75rem;
+}
+
+.stat-item .value{
+  color: #fff;
+  font-weight: 700;
+  margin-top: 4px;
+  font-size: 0.95rem;
+}
+
+
+.form-panel{
+  padding: 8px 12px 12px 12px; /* compact */
+  /* let the panel breathe but keep content inside the container */
+  overflow: visible;
+  max-height: none;
+}
+
+.account-form label{
+  color: rgba(255,255,255,0.85);
+  font-weight: 600;
+}
+
+.account-form .form-control{
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  padding: 8px 10px; /* more compact */
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.account-form .form-control::placeholder {
+  color: #a0a0a0;
+  opacity: 1;
+}
+
+.account-form .mb-3{ margin-bottom: 8px; }
+
+.account-form .form-control:focus{
+  box-shadow: 0 6px 18px rgba(13,110,253,0.06);
+  border-color: rgba(45,212,191,0.9);
+}
+
+.account-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-primary-custom{
+  /* light button that stands out on dark cards; hover inverts to primary color */
+  background: #fff;
+  border: 1px solid var(--my-primary);
+  color: var(--my-primary);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: background 160ms ease, color 160ms ease, transform 120ms ease;
+}
+
+.btn-secondary-custom{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.btn-primary-custom:hover{
+  background: var(--my-primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Password panel that can be toggled */
+.password-toggle{
+  display: inline-block;
+  margin-top: 12px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 700;
+}
+
+.password-panel{
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* Password modal styles */
+.modal-password-input::placeholder {
+  color: #a0a0a0 !important;
+  opacity: 1 !important;
+}
+
+.modal-dark .form-control {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.modal-dark .form-control::placeholder {
+  color: #a0a0a0 !important;
+  opacity: 1 !important;
+}
+
+.modal-dark .form-control:focus {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+@media (max-width: 768px){
+  .account-container{ display: block; }
+  .account-grid{ grid-template-columns: 1fr; }
+  .profile-panel{ padding: 14px; }
+  .form-panel{ padding: 14px; }
+  /* no card wrapper on mobile either */
+  .account-form .row{ gap: 10px; }
+}

@@ -5,6 +5,7 @@ import NewRoutine from "../newRoutine/NewRoutine";
 import Header from "../header/Header";
 import { authFetch } from "../../services/authFetch";
 import Protected from "../routes/protected/Protected";
+import "./dashboard.css";
 
 const Dashboard = ({ handleLogout }) => {
   const [routines, setRoutines] = useState([]);
@@ -29,28 +30,22 @@ const Dashboard = ({ handleLogout }) => {
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--my-bg)",
-        color: "var(--my-text)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "100px",
-      }}
-    >
+    <>
       <Header onLogout={handleLogout} />
-      <Routes>
-        <Route index element={<Routines routines={routines} />} />
-        <Route element={<Protected allowedRoles={["admin", "trainer"]} />}>
-          <Route
-            path="add-routine"
-            element={<NewRoutine onAddRoutine={refreshRoutines} />}
-          />
-        </Route>
-      </Routes>
-    </div>
+      <div className="dashboard-page">
+        <div className="dashboard-container">
+          <Routes>
+            <Route index element={<Routines routines={routines} />} />
+            <Route element={<Protected allowedRoles={["admin", "trainer"]} />}>
+              <Route
+                path="add-routine"
+                element={<NewRoutine onAddRoutine={refreshRoutines} />}
+              />
+            </Route>
+          </Routes>
+        </div>
+      </div>
+    </>
   );
 };
 

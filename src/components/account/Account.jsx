@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Form, Button, Card } from "react-bootstrap";
+import { Form, Button, Modal } from "react-bootstrap";
+import { useRef } from "react";
 import Header from "../header/Header";
+import "./account.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authFetch } from "../../services/authFetch";
@@ -30,6 +32,9 @@ const Account = ({ handleLogout }) => {
     newPassword: "",
     confirmNewPassword: "",
   });
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [avatar, setAvatar] = useState(null);
+  const fileInputRef = useRef(null);
   useEffect(() => {
     if (token) {
       authFetch(`/Users/me`)
@@ -50,7 +55,33 @@ const Account = ({ handleLogout }) => {
           toast.error("No se pudo cargar la información del usuario");
         });
     }
+      // load avatar from localStorage (temporary storage)
+      try {
+        const stored = localStorage.getItem('account_avatar');
+        if (stored) setAvatar(stored);
+      } catch (e) { console.warn('load avatar failed', e); }
   }, [token, emailFromToken]);
+
+    const handleAvatarPick = () => {
+      if (fileInputRef.current) fileInputRef.current.click();
+    };
+
+    const handleAvatarChange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        setAvatar(dataUrl);
+        try { localStorage.setItem('account_avatar', dataUrl); } catch (e) { console.warn('store avatar failed', e); }
+      };
+      reader.readAsDataURL(file);
+    };
+
+    const handleRemoveAvatar = () => {
+      setAvatar(null);
+      try { localStorage.removeItem('account_avatar'); } catch (e) { console.warn('remove avatar failed', e); }
+    };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -167,154 +198,204 @@ const Account = ({ handleLogout }) => {
   return (
     <>
       <Header onLogout={handleLogout} />
-      <div
-        style={{
-          minHeight: "100vh",
-          width: "100%",
-          background: "var(--my-bg)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "flex-start",
-          paddingTop: "100px",
-        }}
-      >
-        <Card
-          style={{ maxWidth: "600px", width: "100%", margin: "0 auto" }}
-          className="bg-dark p-4"
-        >
-          <Card.Body>
-            <h3
-              className="mb-4"
-              style={{
-                fontFamily: "Orbitron, Arial, sans-serif",
-                fontWeight: 700,
-                color: "#fff",
-              }}
-            >
-              Datos de la Cuenta
-            </h3>
-            <Form onSubmit={handleSubmit}>
-              <div className="row">
-                <div className="col-md-6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>Nombre completo</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleChange}
-                      placeholder="Ingrese su nombre"
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Edad</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="edad"
-                      value={formData.edad}
-                      onChange={handleChange}
-                      placeholder="Ingrese su edad"
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Peso (kg)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="peso"
-                      value={formData.peso}
-                      onChange={handleChange}
-                      placeholder="Ingrese su peso"
-                    />
-                  </Form.Group>
-                </div>
-                <div className="col-md-6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>Estatura (cm)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="estatura"
-                      value={formData.estatura}
-                      onChange={handleChange}
-                      placeholder="Ingrese su estatura"
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Teléfono</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="telefono"
-                      value={formData.telefono}
-                      onChange={handleChange}
-                      placeholder="Ingrese su teléfono"
-                    />
-                  </Form.Group>
+      <div className="account-page">
+        <div className="account-container">
+          <div className="account-grid">
+            <div className="profile-panel">
+              <div className="avatar-container">
+                {avatar ? (
+                  <img src={avatar} alt="avatar" className="avatar-img" />
+                ) : (
+                  <div className="avatar">{(formData.nombre || 'U').charAt(0).toUpperCase()}</div>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" style={{display: 'none'}} onChange={handleAvatarChange} />
+                <div className="avatar-overlay">
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    onClick={handleAvatarPick}
+                    aria-label="Subir avatar"
+                    title="Subir avatar"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    onClick={handleRemoveAvatar}
+                    aria-label="Eliminar avatar"
+                    title="Eliminar avatar"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
                 </div>
               </div>
-              <Form.Group className="mb-3">
-                <Form.Label>Correo Electrónico</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="correo"
-                  value={formData.correo}
-                  readOnly
-                />
-              </Form.Group>
-              <Button variant="primary" type="submit">
-                Guardar
-              </Button>
-            </Form>
-            <hr />
-            <h3
-              className="mb-3"
-              style={{
-                fontFamily: "Orbitron, Arial, sans-serif",
-                fontWeight: 700,
-                color: "#fff",
-              }}
-            >
-              Cambiar contraseña
-            </h3>
-            <Form onSubmit={handlePasswordSubmit}>
-              <Form.Group className="mb-3">
-                <Form.Label>Contraseña actual</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  value={passwordData.password}
-                  onChange={handlePasswordChange}
-                  placeholder="Ingrese su contraseña actual"
-                  autoComplete="current-password"
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Nueva contraseña</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="newPassword"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Ingrese la nueva contraseña"
-                  autoComplete="new-password"
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Repetir nueva contraseña</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="confirmNewPassword"
-                  value={passwordData.confirmNewPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Repita la nueva contraseña"
-                  autoComplete="new-password"
-                />
-              </Form.Group>
-              <Button variant="primary" type="submit">
-                Cambiar contraseña
-              </Button>
-            </Form>
-          </Card.Body>
-        </Card>
+              <div className="profile-name">{`${formData.nombre || ''} ${formData.apellido || ''}`.trim() || 'Usuario'}</div>
+              <div className="profile-stats">
+                <div className="stat-item">
+                  <span className="label">Edad</span>
+                  <span className="value">{formData.edad || '-'}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="label">Altura</span>
+                  <span className="value">{formData.estatura ? `${formData.estatura} cm` : '-'}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="label">Peso</span>
+                  <span className="value">{formData.peso ? `${formData.peso} kg` : '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-panel">
+                <h3 className="mb-4 account-title">Datos de la Cuenta</h3>
+                <Form onSubmit={handleSubmit} className="account-form">
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Nombre</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="nombre"
+                          value={formData.nombre}
+                          onChange={handleChange}
+                          placeholder="Ingrese su nombre"
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Edad</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="edad"
+                          value={formData.edad}
+                          onChange={handleChange}
+                          placeholder="Ingrese su edad"
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Peso (kg)</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="peso"
+                          value={formData.peso}
+                          onChange={handleChange}
+                          placeholder="Ingrese su peso"
+                        />
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Estatura (cm)</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="estatura"
+                          value={formData.estatura}
+                          onChange={handleChange}
+                          placeholder="Ingrese su estatura"
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Teléfono</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="telefono"
+                          value={formData.telefono}
+                          onChange={handleChange}
+                          placeholder="Ingrese su teléfono"
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Correo Electrónico</Form.Label>
+                    <Form.Control
+                      type="email"
+                      name="correo"
+                      value={formData.correo}
+                      readOnly
+                    />
+                  </Form.Group>
+                  <div className="account-actions">
+                    <Button className="btn-primary-custom" type="submit">
+                      Guardar
+                    </Button>
+                    <Button className="btn-secondary-custom" type="button" onClick={() => window.location.reload()}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </Form>
+
+                {/* Password now opens in a modal to avoid long card height */}
+                <div style={{marginTop:12}}>
+                  <Button variant="link" className="password-toggle" onClick={() => setShowPasswordModal(true)}>
+                    Cambiar contraseña
+                  </Button>
+                </div>
+
+                <Modal show={showPasswordModal} onHide={() => setShowPasswordModal(false)} centered contentClassName="modal-dark">
+                  <Modal.Header closeButton style={{backgroundColor: 'rgba(20, 22, 25, 0.95)', borderColor: 'rgba(255, 255, 255, 0.18)', color: '#fff'}}>
+                    <Modal.Title style={{color: '#fff'}}>Cambiar contraseña</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body style={{backgroundColor: 'rgba(20, 22, 25, 0.95)', color: '#fff'}}>
+                    <Form onSubmit={(e) => { handlePasswordSubmit(e); setShowPasswordModal(false); }}>
+                      <Form.Group className="mb-3">
+                        <Form.Label style={{color: '#fff'}}>Contraseña actual</Form.Label>
+                        <Form.Control
+                          type="password"
+                          name="password"
+                          value={passwordData.password}
+                          onChange={handlePasswordChange}
+                          placeholder="Ingrese su contraseña actual"
+                          autoComplete="current-password"
+                          style={{backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)'}}
+                          className="modal-password-input"
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label style={{color: '#fff'}}>Nueva contraseña</Form.Label>
+                        <Form.Control
+                          type="password"
+                          name="newPassword"
+                          value={passwordData.newPassword}
+                          onChange={handlePasswordChange}
+                          placeholder="Ingrese la nueva contraseña"
+                          autoComplete="new-password"
+                          style={{backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)'}}
+                          className="modal-password-input"
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label style={{color: '#fff'}}>Repetir nueva contraseña</Form.Label>
+                        <Form.Control
+                          type="password"
+                          name="confirmNewPassword"
+                          value={passwordData.confirmNewPassword}
+                          onChange={handlePasswordChange}
+                          placeholder="Repita la nueva contraseña"
+                          autoComplete="new-password"
+                          style={{backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)'}}
+                          className="modal-password-input"
+                        />
+                      </Form.Group>
+                      <div className="account-actions">
+                        <Button className="btn-primary-custom" type="submit">
+                          Cambiar contraseña
+                        </Button>
+                        <Button className="btn-secondary-custom" type="button" onClick={() => setPasswordData({password:'',newPassword:'',confirmNewPassword:''})}>
+                          Limpiar
+                        </Button>
+                      </div>
+                    </Form>
+                  </Modal.Body>
+                </Modal>
+            </div>
+          </div>
+        </div>
         <ToastContainer />
       </div>
     </>

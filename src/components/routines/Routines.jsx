@@ -79,16 +79,6 @@ const Routines = ({ routines }) => {
 
   return (
     <>
-      {showAddButton && (
-        <Button
-          variant="success"
-          className="me-2 mb-2"
-          onClick={handleNavigateAddRoutine}
-        >
-          Agregar Rutina
-        </Button>
-      )}
-
       {userInfo && userInfo.role === "user" && (
         <div className="my-4 w-100 d-flex flex-column align-items-center">
           <h2>Rutina asignada</h2>
@@ -109,7 +99,17 @@ const Routines = ({ routines }) => {
         </div>
       )}
       <div className="w-100 d-flex flex-column align-items-center">
-        <h2>Rutinas</h2>
+        <div className="d-flex align-items-center gap-3 mb-2">
+          <h2 style={{ color: "white", margin: 0 }}>Rutinas</h2>
+          {showAddButton && (
+            <Button
+              variant="success"
+              onClick={handleNavigateAddRoutine}
+            >
+              Nueva Rutina
+            </Button>
+          )}
+        </div>
         <Form
           className="mb-3 w-100 "
           style={{
