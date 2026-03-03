@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import RoutineItem from "../routineItem/RoutineItem";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
@@ -20,6 +20,16 @@ const Routines = ({ routines }) => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // 🔥 Rol SIEMPRE desde el token
+  const role = useMemo(() => {
+    if (!token) return null;
+    const claims = getUserClaims(token);
+    return normalizeRole(claims?.role);
+  }, [token]);
+
+  const isClient = role === "user";
+  const showAddButton = role === "trainer" || role === "admin";
+
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "routine-assigned-updated") {
@@ -30,15 +40,12 @@ const Routines = ({ routines }) => {
     return () => window.removeEventListener("storage", handler);
   }, []);
 
+  // 🔥 Solo cliente necesita llamar a /Users/me
   useEffect(() => {
     if (!token) return;
 
-    const claims = getUserClaims(token);
-    const role = normalizeRole(claims?.role);
-
-    // Solo clientes tienen /Users/me
-    if (role !== "user") {
-      setUserInfo({ role });
+    if (!isClient) {
+      setUserInfo(null);
       return;
     }
 
@@ -46,24 +53,28 @@ const Routines = ({ routines }) => {
       .then((res) => res.json())
       .then((data) => setUserInfo(data))
       .catch(() => setUserInfo(null));
-  }, [token, storageFlag]);
+  }, [token, isClient, storageFlag]);
 
+  // Resolver rutina asignada
   useEffect(() => {
+    if (!isClient) return;
+
     if (!userInfo?.activeRoutine?.id) {
       setAssignedRoutine(null);
       return;
     }
 
-    const found = routines.find((r) => r.id === userInfo.activeRoutine.id);
-    setAssignedRoutine(found || null);
-  }, [userInfo, routines]);
+    // Si routines trae todas, buscamos la correspondiente
+    const found = routines.find(
+      (r) => r.id === userInfo.activeRoutine.id
+    );
+
+    setAssignedRoutine(found || userInfo.activeRoutine);
+  }, [isClient, userInfo, routines]);
 
   const handleNavigateAddRoutine = () => {
     navigate("/dashboard/add-routine", { replace: true });
   };
-
-  const showAddButton =
-    userInfo && (userInfo.role === "trainer" || userInfo.role === "admin");
 
   const filteredRoutines = routines.filter((routine) =>
     routine.title.toLowerCase().includes(search.toLowerCase())
@@ -81,10 +92,9 @@ const Routines = ({ routines }) => {
     />
   ));
 
-  const isClient = userInfo?.role === "user";
-
   return (
     <>
+      {/* ================= CLIENTE ================= */}
       {isClient && (
         <div className="my-4 w-100 d-flex flex-column align-items-center">
           <h2>Rutina asignada</h2>
@@ -100,26 +110,31 @@ const Routines = ({ routines }) => {
               refreshRoutines={refreshRoutines}
             />
           ) : (
-            <p className="text-muted">No tiene rutina asignada actualmente.</p>
+            <p className="text-muted">
+              No tiene rutina asignada actualmente.
+            </p>
           )}
         </div>
       )}
 
-      {/* SOLO PROFESOR/ADMIN: listado completo + buscador */}
+      {/* ================= PROFESOR / ADMIN ================= */}
       {!isClient && (
         <>
           <div className="w-100 d-flex flex-column align-items-center">
             <div className="d-flex align-items-center gap-3 mb-2">
               <h2 style={{ color: "white", margin: 0 }}>Rutinas</h2>
               {showAddButton && (
-                <Button variant="success" onClick={handleNavigateAddRoutine}>
+                <Button
+                  variant="success"
+                  onClick={handleNavigateAddRoutine}
+                >
                   Nueva Rutina
                 </Button>
               )}
             </div>
 
             <Form
-              className="mb-3 w-100 "
+              className="mb-3 w-100"
               style={{
                 maxWidth: 400,
                 margin: "0 auto",
