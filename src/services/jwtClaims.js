@@ -22,9 +22,29 @@ export function getUserClaims(token) {
 
 export function normalizeRole(role) {
   if (!role) return null;
+
   const r = String(role).toLowerCase();
-  if (r === "admin") return "admin";
-  if (r === "professor" || r === "profesor" || r === "trainer") return "trainer";
-  if (r === "client" || r === "user") return "user";
+
+  // ADMIN
+  if (r === "admin" || r === "administrador")
+    return "admin";
+
+  // PROFESOR
+  if (
+    r === "professor" ||
+    r === "profesor" ||
+    r === "trainer"
+  )
+    return "trainer";
+
+  // CLIENTE / SOCIO
+  if (
+    r === "client" ||
+    r === "cliente" ||
+    r === "user" ||
+    r === "socio"
+  )
+    return "user";
+
   return r;
 }
