@@ -36,13 +36,12 @@ const Routines = ({ routines }) => {
     const claims = getUserClaims(token);
     const role = normalizeRole(claims?.role);
 
-    // Si NO es cliente, guardamos role para habilitar UI (botón, etc)
+    // Solo clientes tienen /Users/me
     if (role !== "user") {
       setUserInfo({ role });
       return;
     }
 
-    // Cliente: trae su perfil con ActiveRoutine
     authFetch(`/Users/me`)
       .then((res) => res.json())
       .then((data) => setUserInfo(data))
@@ -106,7 +105,7 @@ const Routines = ({ routines }) => {
         </div>
       )}
 
-      {/* Si es cliente, NO mostramos el listado completo */}
+      {/* SOLO PROFESOR/ADMIN: listado completo + buscador */}
       {!isClient && (
         <>
           <div className="w-100 d-flex flex-column align-items-center">
