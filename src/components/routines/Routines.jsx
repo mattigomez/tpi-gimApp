@@ -16,6 +16,7 @@ const Routines = ({ routines }) => {
     typeof window.refreshRoutines === "function"
       ? window.refreshRoutines
       : undefined;
+
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -31,26 +32,30 @@ const Routines = ({ routines }) => {
 
   useEffect(() => {
     if (!token) return;
+
     const claims = getUserClaims(token);
     const role = normalizeRole(claims?.role);
-    // Solo clientes tienen /Users/me
-    if (role !== "user") { setUserInfo({ role }); return; }
+
+    // Si NO es cliente, guardamos role para habilitar UI (botón, etc)
+    if (role !== "user") {
+      setUserInfo({ role });
+      return;
+    }
+
+    // Cliente: trae su perfil con ActiveRoutine
     authFetch(`/Users/me`)
       .then((res) => res.json())
       .then((data) => setUserInfo(data))
       .catch(() => setUserInfo(null));
-  }, [token, routines, storageFlag]);
-
+  }, [token, storageFlag]);
 
   useEffect(() => {
     if (!userInfo?.activeRoutine?.id) {
       setAssignedRoutine(null);
       return;
     }
-    const found = routines.find(
-      (r) =>
-        r.id === userInfo.activeRoutine.id
-    );
+
+    const found = routines.find((r) => r.id === userInfo.activeRoutine.id);
     setAssignedRoutine(found || null);
   }, [userInfo, routines]);
 
@@ -77,9 +82,11 @@ const Routines = ({ routines }) => {
     />
   ));
 
+  const isClient = userInfo?.role === "user";
+
   return (
     <>
-      {userInfo && userInfo.role === "user" && (
+      {isClient && (
         <div className="my-4 w-100 d-flex flex-column align-items-center">
           <h2>Rutina asignada</h2>
           {assignedRoutine ? (
@@ -98,43 +105,47 @@ const Routines = ({ routines }) => {
           )}
         </div>
       )}
-      <div className="w-100 d-flex flex-column align-items-center">
-        <div className="d-flex align-items-center gap-3 mb-2">
-          <h2 style={{ color: "white", margin: 0 }}>Rutinas</h2>
-          {showAddButton && (
-            <Button
-              variant="success"
-              onClick={handleNavigateAddRoutine}
-            >
-              Nueva Rutina
-            </Button>
-          )}
-        </div>
-        <Form
-          className="mb-3 w-100 "
-          style={{
-            maxWidth: 400,
-            margin: "0 auto",
 
-          }}
-        >
-          <Form.Control
-            className="routines-search-input"
-            type="text"
-            placeholder="Buscar rutina por nombre..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              color: "var(--my-text)",
-              backgroundColor: "var(--my-bg)", 
-              borderColor: "var(--my-primary)",
-            }}
-          />
-        </Form>
-      </div>
-      <div className="d-flex justify-content-center flex-wrap">
-        {routinesMapped}
-      </div>
+      {/* Si es cliente, NO mostramos el listado completo */}
+      {!isClient && (
+        <>
+          <div className="w-100 d-flex flex-column align-items-center">
+            <div className="d-flex align-items-center gap-3 mb-2">
+              <h2 style={{ color: "white", margin: 0 }}>Rutinas</h2>
+              {showAddButton && (
+                <Button variant="success" onClick={handleNavigateAddRoutine}>
+                  Nueva Rutina
+                </Button>
+              )}
+            </div>
+
+            <Form
+              className="mb-3 w-100 "
+              style={{
+                maxWidth: 400,
+                margin: "0 auto",
+              }}
+            >
+              <Form.Control
+                className="routines-search-input"
+                type="text"
+                placeholder="Buscar rutina por nombre..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  color: "var(--my-text)",
+                  backgroundColor: "var(--my-bg)",
+                  borderColor: "var(--my-primary)",
+                }}
+              />
+            </Form>
+          </div>
+
+          <div className="d-flex justify-content-center flex-wrap">
+            {routinesMapped}
+          </div>
+        </>
+      )}
     </>
   );
 };
