@@ -26,6 +26,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
   const [formTriedSubmit, setFormTriedSubmit] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [duplicateTitleError, setDuplicateTitleError] = useState("");
+  const [exerciseSuccessMessage, setExerciseSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState(1);
   const navigate = useNavigate();
 
@@ -74,6 +75,8 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
       setExerciseName("");
       setSets("");
       setRepetitions("");
+      setExerciseSuccessMessage("Ejercicio agregado");
+      setTimeout(() => setExerciseSuccessMessage(""), 1500);
     } catch {
       toast.error("Error de conexión al crear el ejercicio");
     }
@@ -90,6 +93,8 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
         { id: ex.id, name: ex.name, sets: ex.sets, repetitions: ex.repetitions },
       ]);
       setSelectedExerciseId("");
+      setExerciseSuccessMessage("Ejercicio agregado");
+      setTimeout(() => setExerciseSuccessMessage(""), 1500);
     }
   };
 
@@ -312,6 +317,9 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
             {activeTab === 2 && (
               <div className="tab-content">
                 <h4>Agregar Ejercicios</h4>
+                <div className="exercise-success-message">
+                  {exerciseSuccessMessage}
+                </div>
 
                 <div className="exercise-section">
                   <h5>Ejercicio Existente</h5>

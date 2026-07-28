@@ -227,8 +227,8 @@ const Partners = ({ handleLogout }) => {
                   className="mb-4 d-flex justify-content-center"
                   style={filteredUsers.length <= 2 ? { maxWidth: 420 } : {}}
                 >
-                  <Card className="partner-card text-white h-100 w-100">
-                    <Card.Body>
+                  <Card className="partner-card text-white w-100">
+                    <Card.Body className="d-flex flex-column">
                       <div>
                         <div><b>Email:</b> {u.email}</div>
                         <div><b>Rol:</b> {u.roleName}</div>
@@ -248,7 +248,7 @@ const Partners = ({ handleLogout }) => {
                             )}
 
                             {(userRole === "admin" || userRole === "trainer") && (
-                              <div className="mt-2 d-flex gap-2 align-items-center">
+                              <div className="mt-2 card-routine-controls">
                                 <select
                                   value={u.activeRoutine?.id || ""}
                                   onChange={(e) => handleAssignRoutine(u.id, e.target.value)}
@@ -277,7 +277,7 @@ const Partners = ({ handleLogout }) => {
                       </div>
                     </Card.Body>
 
-                    <Card.Footer className="bg-transparent border-0">
+                    <Card.Footer className="bg-transparent border-0 mt-auto">
                       {userRole === "admin" && (
                         <Button
                           variant="danger"

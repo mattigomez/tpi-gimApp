@@ -39,6 +39,35 @@
 .partner-card{
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.partner-card .card-body {
+  flex-grow: 1;
+}
+
+.card-routine-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.card-routine-controls select {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 576px) {
+  .card-routine-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .card-routine-controls select,
+  .card-routine-controls button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px){
