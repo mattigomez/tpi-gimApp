@@ -97,7 +97,7 @@ const Routines = ({ routines }) => {
       {/* ================= CLIENTE ================= */}
       {isClient && (
         <div className="my-4 w-100 d-flex flex-column align-items-center">
-          <h2>Rutina asignada</h2>
+          <h2 style={{ color: "white", padding: "30px" }}>Rutina asignada</h2>
           {assignedRoutine ? (
             <RoutineItem
               key={assignedRoutine.id}
@@ -110,7 +110,7 @@ const Routines = ({ routines }) => {
               refreshRoutines={refreshRoutines}
             />
           ) : (
-            <p className="text-muted">
+            <p className="text-white">
               No tiene rutina asignada actualmente.
             </p>
           )}

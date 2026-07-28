@@ -116,22 +116,28 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
       return;
     }
     if (!title.trim()) {
+      setActiveTab(1);
       toast.error("El título es obligatorio");
       return;
     }
     if (title.length > 60) {
+      setActiveTab(1);
       toast.error("El título no puede superar los 60 caracteres");
       return;
     }
     if (!description.trim()) {
+      setActiveTab(1);
       toast.error("La descripción es obligatoria");
       return;
     }
     if (description.length > 200) {
+      setActiveTab(1);
       toast.error("La descripción no puede superar los 200 caracteres");
       return;
     }
     if (!Array.isArray(exercises) || exercises.length === 0) {
+      setActiveTab(2);
+      toast.error("Debe agregar al menos un ejercicio");
       return;
     }
     for (const ex of exercises) {
@@ -238,7 +244,7 @@ const NewRoutine = ({ initialData, isEditMode = false, onClose }) => {
             </button>
           </div>
 
-          <Form onSubmit={handleSubmit} autoComplete="off">
+          <Form onSubmit={handleSubmit} noValidate autoComplete="off">
             {/* TAB 1: DATOS BÁSICOS */}
             {activeTab === 1 && (
               <div className="tab-content">

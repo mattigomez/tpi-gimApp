@@ -233,42 +233,47 @@ const Partners = ({ handleLogout }) => {
                         <div><b>Email:</b> {u.email}</div>
                         <div><b>Rol:</b> {u.roleName}</div>
 
-                        <div className="mt-2">
-                          <b>Rutina activa:</b>{" "}
-                          {u.activeRoutine?.title ? (
-                            <span>
-                              {u.activeRoutine.title} ({u.activeRoutine.level})
-                            </span>
-                          ) : (
-                            <span className="text-warning">Sin rutina activa</span>
-                          )}
+                        {((u.roleName || "").toString().toLowerCase().includes("client") ||
+                          (u.roleName || "").toString().toLowerCase().includes("cliente") ||
+                          (u.roleName || "").toString().toLowerCase().includes("user") ||
+                          u.rolId === 3) && (
+                          <div className="mt-2">
+                            <b>Rutina activa:</b>{" "}
+                            {u.activeRoutine?.title ? (
+                              <span>
+                                {u.activeRoutine.title} ({u.activeRoutine.level})
+                              </span>
+                            ) : (
+                              <span className="text-warning">Sin rutina activa</span>
+                            )}
 
-                          {(userRole === "admin" || userRole === "trainer") && (
-                            <div className="mt-2 d-flex gap-2 align-items-center">
-                              <select
-                                value={u.activeRoutine?.id || ""}
-                                onChange={(e) => handleAssignRoutine(u.id, e.target.value)}
-                              >
-                                <option value="">Seleccionar rutina</option>
-                                {routines.map((r) => (
-                                  <option key={r.id} value={r.id}>
-                                    {r.title} ({r.level})
-                                  </option>
-                                ))}
-                              </select>
-
-                              {u.activeRoutine?.id && (
-                                <Button
-                                  size="sm"
-                                  variant="outline-warning"
-                                  onClick={() => handleUnassignRoutine(u.id, u.activeRoutine.id)}
+                            {(userRole === "admin" || userRole === "trainer") && (
+                              <div className="mt-2 d-flex gap-2 align-items-center">
+                                <select
+                                  value={u.activeRoutine?.id || ""}
+                                  onChange={(e) => handleAssignRoutine(u.id, e.target.value)}
                                 >
-                                  Quitar
-                                </Button>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                                  <option value="">Seleccionar rutina</option>
+                                  {routines.map((r) => (
+                                    <option key={r.id} value={r.id}>
+                                      {r.title} ({r.level})
+                                    </option>
+                                  ))}
+                                </select>
+
+                                {u.activeRoutine?.id && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline-warning"
+                                    onClick={() => handleUnassignRoutine(u.id, u.activeRoutine.id)}
+                                  >
+                                    Quitar
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </Card.Body>
 
